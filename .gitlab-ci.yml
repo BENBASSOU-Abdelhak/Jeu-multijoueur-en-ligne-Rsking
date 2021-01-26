@@ -1,0 +1,42 @@
+# This file is a template, and might need editing before it works on your project.
+# use the official gcc image, based on debian
+# can use verions as well, like gcc:5.2
+# see https://hub.docker.com/_/gcc/
+image: ubuntu:18.04
+
+build:
+  stage: build
+  script:
+    - exit 0
+    # TODO
+  
+# run tests using the binary built
+test:
+  stage: test
+  script:
+    - exit 0
+    # TODO avec CTest
+
+#run coverage
+#gcov:
+#  stage: deploy
+#  before_script:
+#    - apt-get -qq update && apt-get -qq install -y make autoconf gcovr ggcov lcov
+#  script:
+#    - make clean && make GCOV=1 test
+#    - ./tests.sh
+#    - gcovr -s -f src/
+#  coverage: '/lines: \d+\.\d+/'
+
+# generate documentation
+doc:
+  stage: deploy
+  before_script:
+    - apt update && apt -y install gcc make autoconf doxygen ruby
+    - gem install asciidoctor asciidoctor-pdf --pre
+  script:
+    - make doc
+    - asciidoctor-pdf doc/*.adoc
+  artifacts:
+    paths:
+      - "doc/*.pdf"
