@@ -1,0 +1,79 @@
+= Spécification de communication client <-> serveur
+Léo Chéneau <leo.cheneau@etu.unistra.fr>
+v1.0, 2020-01-28
+:toc:
+:toclevels: 4
+
+<<<
+
+## Canaux de communication
+
+Il y aura **deux canaux** de communication différents entre le client et le serveur.
+
+* Un premier pour tout ce qui n'est pas en lien avec les salons (création/rejoindre/lancer partie) ou avec le déroulement de parties. +
+** *Connexion* à un compte et récupération de *https://jwt.io/introduction[JWT]*
+** *Création* de compte et inscriptions
+** *Affichage* des informations liées aux joueurs et aux parties [.underline]#terminées#
+
+Le client communiquera sur ce canal via des requêtes **AJAX**.
+
+TIP: https://git.unistra.fr/cheneau/programmation-web-2---s4---2020/-/tree/master/ajax[Exemple d'AJAX en PHP]. Notamment https://git.unistra.fr/cheneau/programmation-web-2---s4---2020/-/blob/master/ajax/auth.php[auth.php]
+
+TIP: https://git.unistra.fr/cheneau/programmation-web-2---s4---2020/-/blob/master/assets/jwt.php[JWT avec PHP] et https://github.com/firebase/php-jwt[Firebase]
+
+TIP: https://git.unistra.fr/cheneau/programmation-web-2---s4---2020/-/blob/master/assets/header_login_ajax.js[JWT et Ajax en Javascript]
+
+NOTE: Pour plus d'informations sur ce canal et les requêtes voir le document associé.
+
+* Un deuxième canal s'occupera de :
+** Créer, configurer et rejoindre les *salons*.
+** Communiquer et recevoir les actions des joueurs *pendant la partie*.
+
+Le client communiquera sur ce canal via des **WebSockets** (SSL).
+
+<<<
+
+## AJAX
+
+Voir le documentation de spécification des requêtes AJAX disponibles.
+
+TIP: https://www.w3schools.com/js/js_ajax_intro.asp[Introduction à l'AJAX en JS]
+
+TIP: https://youtu.be/7S4CukCtYeM[Vidéo complète sur AJAX + PHP]
+
+<<<
+
+## WebSockets
+
+### Technologie
+
+#### Sécurité
+
+Afin d'assurer une authentification fiable et une sécurité relative des données le protocole sera WebSocket over SSL (**WSS**). https://tools.ietf.org/html/rfc6455[RFC 6455]
+
+#### Client
+
+Le client utilisera la librairie **Javascript** de base pour communiquer avec le serveur.
+
+NOTE: Plus d'informations sont disponibles dans la https://git.unistra.fr/risking/risking-client[spécification client].
+
+TIP: https://javascript.info/websocket[Programmer avec les WebSockets en JS]
+
+
+#### Serveur
+
+Le serveur WebSocket sera codé en C++ avec l'aide de librairie https://www.boost.org/doc/libs/1_66_0/libs/beast/doc/html/beast/using_websocket.html[Boost].
+
+NOTE: Plus d'informations sont disponibles dans la spécification d'link:architecture_generale.adoc[architecure générale].
+
+TIP: https://zestedesavoir.com/tutoriels/822/la-programmation-en-c-moderne/[Un bon tuto C++ complet]
+
+TIP: https://cpp.developpez.com/faq/cpp/[Ressource à lire absolument]
+
+### Protocole de messages
+
+Tous les messages sont disponibles dans le fichier de documentation link:messages.adoc[Messages]
+
+Pour expliciter les échanges de messages et voir des exemples, se référer aux diagrammes de ce même dossier.
+
+
