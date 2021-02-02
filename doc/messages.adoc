@@ -1,4 +1,402 @@
-# Messages
+= Spécification des messages
+Léo Chéneau <leo.cheneau@etu.unistra.fr>
+v1.0, 2020-01-26
+:toc:
+:toclevels: 4
+
+<<<
+
 ## Specification technique
 
-TODO
+### Protocoles et Idées
+
+- Le serveur et le client communiqueront les éléments logiques via le protocole **WebSocket** défini dans https://tools.ietf.org/html/rfc6455[https://tools.ietf.org/html/rfc6455] avec une couche **SSL** comme recommandé.
+- Les données seront encodées en **Little-Endian** sur le réseau. (les bibliothèques gèrent ça pour nous)
+- Les messages côté serveur seront traités via la librairie *Boost* et son module WebSocket.
+- Les chaînes de caractères seront encodées en **UTF-8** et seront en **unicode**.
+
+<<<
+
+### Messages
+
+#### Introduction
+
+On essaiera le plus possible de minimiser la taille des informations envoyées.  
+C'est à dire qu'on se contentera d'un *uint16_t* si on pense qu'on ne dépassera JAMAIS 2^16^ valeurs.  
+
+WARNING: Toutefois si on pense que ce cas de figure peut arriver on se laissera la place.  
+
+NOTICE: On considérera les pseudos des joueurs comme unique.
+
+Les types utilisés correspondent au type C définis dans *stdint.h*.
+
+L'*origine* des messages sera précisée, en son absence, le message est bidirectionnel.
+
+Un code de message sera toujours sur 1 octet et sera toujours non-signé. +
+Les codes de messages seront en hexadécimal.
+
+Les messages seront spécifiés en utilisant le format suivant :
+
+.Format (Origine)
+:===
+:Code:1er élément:2è élément:etc
+Description::::
+Type::::
+:===
+
+Les erreurs pouvant être renvoyés côté serveur seront présentées dans un tableau :
+
+.Erreurs
+****
+:===
+Sous-code n°1:Description brève de l'erreur
+Sous-code n°2:...
+:===
+****
+
+<<<
+
+#### Erreurs
+
+Tout message envoyé au serveur recevra une réponse.  
+Toutefois, si le message envoyé n'est pas adapté (voir plus bas), le serveur pourra renvoyer un message d'erreur.
+
+Un message n'est pas adapté si :
+
+- Le message n'arrive pas au bon moment  
+   _Exemple: un joueur veut faire une action mais ce n'est pas son tour_
+
+- Le message contient des valeur erronées qui entrainent une action interdite par les règles.
+  _Exemple: Demander à placer 10 troupes quand on ne peut en placer que 8._  
+
+NOTE: Un message de ce type entrainera le *bannissement du joueur* dans les versions finales.
+
+- Un autre problème est arrivé du côté serveur.
+
+Tous les messages d'erreur suivront le même format :
+
+.Message d'erreur (serveur)
+:===
+Code:Sous-code:Message
+**0x0**:Code d'erreur associé:Description de l'erreur
+_uint8_t_:_uint8_t_:_string_
+:===
+
+IMPORTANT: Le client devra TOUJOURS gérer le cas où le serveur renvoie une erreur.
+
+IMPORTANT: Le sous-code 0 est reservé à une erreur côté serveur, comme un crash.
+
+<<<
+
+#### Création de salon
+
+Le créateur de salon doit être authentifié via un JWT pour pouvoir créer un salon
+
+.Message de création de salon (client)
+:===
+Code:Paramètres du salon:JWT
+*0x10*:Paramètres de la partie:JWT donné par le serveur Apache à la connexion
+_uint8_t_:Voir plus bas:chaîne de caractère JWT standard
+:===
+
+Si c'est possible le serveur répondra avec un ID aléatoire généré.
+
+NOTE: C'est au client de mettre éventuellement en forme cet ID.
+
+.Message de salon créé (serveur)
+:===
+Code:ID
+*0x11*:Identifiant numérique du salon
+_uint8_t_:_uint64_t_
+:===
+
+##### Paramètres du salon
+
+WARNING: Les paramètres du salon peuvent-être amenés à évoluer au fil des versions.
+
+:===
+Nombre de joueurs max:ID de la map:temps par tour (s)
+_uint8_t_:_uint16_t_:_uint16_t_
+:===
+
+CAUTION: Nombre de joueurs > 1 && ID map doit exister && temps > 0
+
+.Erreurs
+****
+:===
+0x1:JWT incorrect
+0x2:Erreur dans la pramètre 1
+...:...
+0xF:Erreur dans le paramètre 14
+:===
+****
+<<<
+
+#### Rejoindre salon
+
+Nimporte qui disposant de l'ID du salon peut rejoindre
+
+.Message pour rejoindre (client)
+:===
+Code:ID:JWT
+*0x12*:ID du salon généré précédemment:JWT généré par le serveur à la connexion
+_uint8_t_:_uint64_t_:string
+:===
+
+Lorsque le client rejoint un salon il recoit les paramètres du salon.
+
+.Message des paramètres du salon (serveur)
+:===
+Code:Paramètres
+*0x13*:Voir paramètres
+_uint8_t_:ci-dessus
+:===
+
+À tous changement de la liste des joueurs, un message de MAJ sera envoyé aux joueurs du salon.
+
+.Message de MAJ salon (serveur)
+:===
+Code:Joueur maître:Joueur 1:...:Joueur N
+*0x14*:pseudo:pseudo:...:pseudo
+_uint8_t_:string:string:...:string
+:===
+
+.Erreurs
+****
+:===
+0x10:JWT incorrect
+0x11:ID de salon incorrect
+0x12:Salon déjà plein
+0x13:Partie déjà en cours
+:===
+****
+
+<<<
+
+#### Quitter ou Expulser du salon
+
+Le créateur du salon peut choisir d'expulser quelqu'un du salon.
+
+NOTE: Un joueur expulsé ne pourra plus rejoindre ce salon après coup.
+
+Un joueur peut s'expulser tout seul pour quitter la partie, il pourra toujours rejoindre.
+
+.Message d'expulsion (client)
+:===
+Code:Joueur
+*0x15*:Joueur à expulser
+_uint8_t_:string
+:===
+
+NOTE: Un message de mise à jour sera envoyé aux joueurs restant.
+
+.Message d'expulsion (serveur)
+:===
+Code:Explications
+*0x16*:Motif d'expulsion
+_uint8_t_:string
+:===
+
+.Erreurs
+****
+:===
+0x13:Le joueur n'a pas le droit d'expulser
+0x14:Le joueur n'existe pas dans ce salon
+:===
+****
+
+<<<
+
+#### Démarrer une partie
+
+Émis exclusivement par le maître du salon.
+
+Cela lance une partie sur la map spécifiée en paramètres avec N joueurs.
+
+.Message de lancement (client)
+:===
+Code:
+*0x20*:
+_uint8_t_:
+:===
+
+Le serveur envoie alors à tous les joueurs le message :
+
+.Message de lancement (serveur)
+:===
+Code:
+*0x21*:
+_uint8_t_:
+:===
+
+.Erreurs
+****
+:===
+0x20:Pas assez de joueurs
+:===
+****
+
+<<<
+
+#### Tour de jeu
+
+Signale aux joueurs que c'est au tour du joueur X ainsi que le nombre de troupes.
+
+.Message nouveau tour (serveur)
+:===
+Code:Joueur:Troupes
+*0x30*:Pseudo du joueur:Nombre de troupes à placer
+_uint8_t_:string:_uint16_t_
+:===
+
+Un client peut aussi signaler qu'il veut terminer son tour.
+
+.Message fin de tour (client)
+:===
+Code:
+*0x31*:
+_uint8_t_:
+:===
+
+CAUTION: Si le temps de jeu est dépassé et que le joueur n'a pas placé de troupes, ses troupes seront placées au hasard.
+
+.Erreurs
+****
+:===
+0x30:Ce n'est pas à votre tour
+:===
+****
+
+<<<
+
+#### Placer troupes
+
+Le client envoie son placement au serveur
+
+.Message de placement de troupes (client)
+:===
+Code:Case:Nombre
+*0x40*:ID de la case:Nombre de troupes
+_uint8_t_:_uint16_t_:_uint16_t_
+:===
+
+Le serveur répond à tous les joueurs que le placement a été fait
+
+.Message de placement de troupes (serveur)
+:===
+Code:Case:Nombre
+*0x41*:ID de la case:Nombre de troupes
+_uint8_t_:_uint16_t_:_uint16_t_
+:===
+
+NOTE: Si il ne reste plus de troupes à placer, un message de nouvel phase est envoyé.
+
+.Erreurs
+****
+:===
+0x40:La case n'est pas au joueur
+0x41:Pas assez de troupes
+:===
+****
+
+<<<
+
+#### Attaquer
+
+Le client peut choisir d'attaquer une cible voisine.
+
+.Message d'attaque (client)
+:===
+Code:Case origine:Case Destination:Nombre troupes
+*0x50*:ID de la case d'origine:ID de la case de destination:Nombre de troupes utilisées en attaque
+_uint8_t_:_uint16_t_:_uint16_t_:uint16_t
+:===
+
+Le serveur répond alors à tous les clients
+
+.Message d'attaque (serveur)
+:===
+Code:Case d'origine:Case Destination:Nombre troupes:Résultat:Pertes:Dés
+*0x51*:ID case:ID case:Troupes à l'attaque:0 ou 1:Troupes perdues:Tableau des dés tirés
+_uint8_t_:_uint16_t_:_uint16_t_:_uint16_t_:_bool_:_uint16_t_:_uint8_t[]_
+:===
+
+Un résultat à 1 signifie une victoire, 0 signifie une défaite.
+
+Le serveur attendra alors un et un seul message de transfert de troupes (avec les bonnes cases d'origine et destination).
+
+NOTE: Si le timer expire, une seule troupe sera placée.
+
+.Erreurs 
+****
+:===
+0x50:Mauvaise case d'origine
+0x51:Mauvaise case de destination
+0x52:Nombre de troupes erroné
+:===
+****
+
+<<<
+
+#### Transfert de troupes
+
+Après une attaque gagnante ou bien après avoir fini sa phase d'attaque, le joueur peut transférer des troupes.
+
+.Message de transfert (client)
+:===
+Code:Case origine:Case Destination:Nombre troupes
+*0x60*:ID de la case d'origine:ID de la case de destination:Nombre de troupes à transférer
+_uint8_t_:_uint16_t_:_uint16_t_:uint16_t
+:===
+
+Si le transfert est autorisé, le serveur envoie un message à tous les joueurs :
+
+.Message de transfert (serveur)
+:===
+Code:Case origine:Case Destination:Nombre troupes
+*0x61*:ID de la case d'origine:ID de la case de destination:Nombre de troupes à transférer
+_uint8_t_:_uint16_t_:_uint16_t_:uint16_t
+:===
+
+.Erreurs 
+****
+:===
+0x60:Mauvaise case d'origine
+0x61:Mauvaise case de destination
+0x62:Nombre de troupes erroné
+:===
+****
+
+#### Phase suivante
+
+Le joueur peut demander à passer ou terminer la phase courante.
+
+NOTE: Passer la phase de transfert terminera le tour.
+
+.Message passage de phase (client)
+:===
+Code:
+*0x70*:
+_uint8_t_:
+:===
+
+Le serveur enverra à tous les joueurs le message :
+.Message nouvelle phase (serveur)
+:===
+Code:Phase:Temps restant
+*0x71*:1 ou 2 ou 3:Le nombre de secondes restantes
+_uint8_t_:_uint8_t:_uint16_t_
+:===
+
+- _1_ : Phase de déploiement
+- _2_ : Phase d'attaque
+- _3_ : Phase de transfert
+
+.Erreurs
+****
+:===
+0x70:Ce n'est pas votre tour
+0x71:Phase non passable
+:===
+****
+
