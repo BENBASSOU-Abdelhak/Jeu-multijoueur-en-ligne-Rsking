@@ -1,0 +1,65 @@
+= Spécification des JWT
+Léo Chéneau <leo.cheneau@etu.unistra.fr>
+v1.0, 2020-01-26
+:toc:
+:toclevels: 4
+
+## Introduction
+
+Les JWT tels que définis dans le https://tools.ietf.org/html/rfc7519[RFC 7519] seront utilisés pour l'authentification et la transmission des _UID_ et _gamertag_.
+
+Ils seront générés par le serveur Apache et transmis à la connexion.
+
+Ils seront utilisés par le serveur de jeu au moment de créer/rejoindre un salon.
+
+## Algorithmes
+
+On utilisera l'algorithme *RS256* avec une *clé privée RSA* de 4096 bits.
+
+IMPORTANT: La clé privée sera générée par une autorité de certification, normalement https://letsencrypt.org/[Let's encrypt] et sera gardée secrète. +
+Elle sera donc stockée là où sont stockées le clés pour le SSL d'apache.
+
+## Contenu
+
+Notre *payload* sera composé des champs :
+
+* `iss` : Le nom de l’émetteur. (risk.zefresk.com)
+
+* `sub` : L'uid du joueur.
+
+* `name` : le gamertag du joueur.
+
+* `iat` : la date d’émission du JWT.
+
+* `exp` : la date d’expiration du JWT.
+
+* `nbf` : Date de début de validité (= iat)
+
+* `jti` : Nombre aléatoire sur 64 bits.
+
+## Ressources pour développer
+
+### C++ - serveur
+En *{cpp}* on utilisera : https://github.com/pokowaka/jwt-cpp[jwt-cpp]
+
+### Javascript / AJAX / PHP - Client
+
+Pour le JS/AJAX/PHP on utilisera *Firebase*.
+
+#### Exemple complet
+
+Un exemple complet est disponible ici :
+
+* https://git.unistra.fr/cheneau/programmation-web-2---s4---2020/-/blob/master/assets/jwt.php[Création d'un JWT en PHP]
+
+WARNING: La clé finale ne sera pas dans le fichier !
+
+* https://git.unistra.fr/cheneau/programmation-web-2---s4---2020/-/blob/master/assets/header_login_ajax.js[Connexion via AJAX en Javascript]
+
+* https://git.unistra.fr/cheneau/programmation-web-2---s4---2020/-/blob/master/ajax/auth.php[Page AJAX d'authentification en PHP]
+
+#### Suppléments
+
+Pour tester les JWT on peut utiliser https://jwt.io
+
+Pour la doc de Firebase on peut se référer à leur https://github.com/firebase/php-jwt[README github]
