@@ -2,20 +2,33 @@
 # use the official gcc image, based on debian
 # can use verions as well, like gcc:5.2
 # see https://hub.docker.com/_/gcc/
-image: ubuntu:18.04
+image: ubuntu:20.04
 
 build:
   stage: build
+  before_script:
+    - export DEBIAN_FRONTEND=noninteractive
+    - ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
+    - apt update && apt -y install g++ make autoconf cmake libboost-all-dev
   script:
-    - exit 0
-    # TODO
+    - mkdir build && cd build
+    - cmake ..
+    - make
+  artifacts:
+    paths:
+        - build/
+    expire_in: 7 days
   
 # run tests using the binary built
 test:
   stage: test
+  before_script:
+    - apt update && apt -y install make cmake
+  dependencies:
+    - build
   script:
-    - exit 0
-    # TODO avec CTest
+    - cd build
+    - make test
 
 #run coverage
 #gcov:
@@ -40,3 +53,4 @@ doc:
   artifacts:
     paths:
       - "doc/*.pdf"
+    expire_in: 7 days
