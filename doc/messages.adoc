@@ -124,6 +124,7 @@ CAUTION: Nombre de joueurs > 1 && ID map doit exister && temps > 0
 .Erreurs
 ****
 :===
+*Sous-code*:Signification
 0x1:JWT incorrect
 0x2:Erreur dans la pramètre 1
 ...:...
@@ -164,6 +165,7 @@ _uint8_t_:string:string:...:string
 .Erreurs
 ****
 :===
+*Sous-code*:Signification
 0x10:JWT incorrect
 0x11:ID de salon incorrect
 0x12:Salon déjà plein
@@ -200,6 +202,7 @@ _uint8_t_:string
 .Erreurs
 ****
 :===
+*Sous-code*:Signification
 0x13:Le joueur n'a pas le droit d'expulser
 0x14:Le joueur n'existe pas dans ce salon
 :===
@@ -232,6 +235,7 @@ _uint8_t_:
 .Erreurs
 ****
 :===
+*Sous-code*:Signification
 0x20:Pas assez de joueurs
 :===
 ****
@@ -263,6 +267,7 @@ CAUTION: Si le temps de jeu est dépassé et que le joueur n'a pas placé de tro
 .Erreurs
 ****
 :===
+*Sous-code*:Signification
 0x30:Ce n'est pas à votre tour
 :===
 ****
@@ -294,6 +299,7 @@ NOTE: Si il ne reste plus de troupes à placer, un message de nouvel phase est e
 .Erreurs
 ****
 :===
+*Sous-code*:Signification
 0x40:La case n'est pas au joueur
 0x41:Pas assez de troupes
 :===
@@ -330,6 +336,7 @@ NOTE: Si le timer expire, une seule troupe sera placée.
 .Erreurs 
 ****
 :===
+*Sous-code*:Signification
 0x50:Mauvaise case d'origine
 0x51:Mauvaise case de destination
 0x52:Nombre de troupes erroné
@@ -361,6 +368,7 @@ _uint8_t_:_uint16_t_:_uint16_t_:uint16_t
 .Erreurs 
 ****
 :===
+*Sous-code*:Signification
 0x60:Mauvaise case d'origine
 0x61:Mauvaise case de destination
 0x62:Nombre de troupes erroné
@@ -395,6 +403,7 @@ _uint8_t_:_uint8_t:_uint16_t_
 .Erreurs
 ****
 :===
+*Sous-code*:Signification
 0x70:Ce n'est pas votre tour
 0x71:Phase non passable
 :===
