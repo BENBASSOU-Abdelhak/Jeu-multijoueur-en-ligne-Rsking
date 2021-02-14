@@ -183,12 +183,16 @@ NOTE: Un joueur expulsé ne pourra plus rejoindre ce salon après coup.
 
 Un joueur peut s'expulser tout seul pour quitter la partie, il pourra toujours rejoindre.
 
+Le client enverra le message suivant s'il souhaite quitter ou exclure un joueur.
+
 .Message d'expulsion (client)
 :===
 Code:Joueur
 *0x15*:Joueur à expulser
 _uint8_t_:string
 :===
+
+Le serveur enverra alors un message au joueur expulsé (et lui uniquement) pour lui signifier la raison de l'exclusion.
 
 NOTE: Un message de mise à jour sera envoyé aux joueurs restant.
 
