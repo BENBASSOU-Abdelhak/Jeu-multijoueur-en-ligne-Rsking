@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 3.13) # see spec and target OS
 
 project(risking VERSION 0.1)
 
+# Default build type
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+		"Default build type: Debug" FORCE)
+	message(NOTICE "-- CMAKE_BUILD_TYPE not provided, set to ${CMAKE_BUILD_TYPE}")
+endif()
+
+# directories
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/include")
 set(TES_DIR "${PROJECT_SOURCE_DIR}/tests")
@@ -28,9 +37,9 @@ set_target_properties(risking_lib risking PROPERTIES
 	CXX_STANDARD_REQUIRED YES)
 
 # Flags
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG -fno-inline")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -DDEBUG -fno-inline")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 
 # Boost
 find_package(Boost 1.67 REQUIRED COMPONENTS
@@ -40,7 +49,11 @@ target_link_libraries(risking_lib PUBLIC Boost::system Boost::thread Boost::rege
 
 # Tests
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include(CTest)
+	include(CTest)
+endif()
+
+if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND COVERAGE)
+	include(CodeCoverage)
 endif()
 
 enable_testing()
