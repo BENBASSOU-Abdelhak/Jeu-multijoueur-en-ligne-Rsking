@@ -1,0 +1,118 @@
+= Schéma SQL
+Mathéo Cimbaro <matheo.cimbaro@etu.unistra.fr>
+v1.1, 2020-02-10
+:toc:
+:toclevels: 4
+
+<<<
+
+.Table de correspondance entre nom des types et type SQL
+[cols=2]
+|===
+| *Nom du type* | *Type SQL*
+| Chaîne de caractères (String) | VARCHAR(_N_)
+| Entier court | SMALLINT
+| Octet | BINARY(_N_)
+| Date et heure complète (Timestamp) | TIMESTAMP
+| UUID | VARBINARY(16)
+|===
+
+== Table `user`
+
+Cette table stocke les informations relatives aux comptes utilisateurs.
+Chaque compte d'utilisateur est une entrée dans la table - créée au moment où un nouveau joueur souhaite jouer une partie.
+Il est important de noter qu'un compte est nécessaire pour jouer une partie, avoir un historique, etc.
+Bien que nous ne demandons pas explicitement à un utilisateur de créer un compte pour qu'il puisse accéder au jeu, en réalité, un compte lui est créé dynamiquement.
+
+Conformément au RGPD, les utilisateurs doivent pouvoir supprimer leur compte.
+La suppression d'un compte entrainera la suppression en chaîne de l'intégralité de l'historique d'un utilisateur.
+
+.Champs dans la table `user`
+[cols=3]
+|===
+| *Nom du champ* | *Type* | *Contraintes*
+| id | UUID | Non null
+| gamertag | String | Taille max. 45 caractères
+| password | Octets | Taille max. 64 octets
+| email | String | Taille max. 128 caractères
+|===
+
+.Indexation
+[cols="1,1,2"]
+|===
+| *Nom du champ* | *Unique* | *Contraintes référencielles*
+| id | Y | Clé primaire
+| gamertag | Y | Index
+| email | Y | Index
+|===
+
+== Table `game`
+
+Cette table stocke les informations relatives aux parties terminées.
+À la fin d'une partie, une nouvelle entrée est ajoutée à cette table.
+
+.Champs dans la table `game`
+[cols=3]
+|===
+| *Nom du champ* | *Type* | *Contraintes*
+| id | UUID | Non null
+| start_time | Timestamp | Non null
+| end_time | Timestamp | Non null
+| number_of_players | Entier court | Non null, minimum = 1
+|===
+
+.Indexation
+[cols="1,1,2"]
+|===
+| *Nom du champ* | *Unique* | *Contraintes référencielles*
+| id | Y | Clé primaire
+|===
+
+== Table `game_has_user`
+
+Cette table stocke les informations propres à un utilisateur pour une partie spécifique.
+L'insertion dans cette table est faite à la fin de partie, et non à la mort d'un joueur.
+
+En plus des champs permettant la relation, cette table contient un champ `rank` qui correspond au placement final du joueur.
+Ce nombre n'est rien d'autre que le nombre de joueurs encore dans la partie à l'élimination du dit joueur.
+Par conséquent, un `rank` valant `1` signifie que le joueur a remporté la partie.
+
+.Champs dans la table `game_has_user`
+[cols=3]
+|===
+| *Nom du champ* | *Type* | *Contraintes*
+| user_id | UUID | Non null
+| game_id | UUID | Non null
+| rank | Entier court | Non null, minimum = 1
+|===
+
+.Indexation
+[cols="1,1,2"]
+|===
+| *Nom du champ* | *Unique* | *Contraintes référencielles*
+| user_id, game_id | Y | Clé primaire
+|===
+
+== Table `ban`
+
+Cette table stocke les bannissements des joueurs.
+Un bannissement est constitué d'une raison, d'une date de début (date courante) ainsi que d'une date de fin (d'expiration).
+
+.Champs dans la table `ban`
+[cols=3]
+|===
+| *Nom du champ* | *Type* | *Contraintes*
+| id | UUID | Non null
+| user_id | UUID | Non null
+| reason | String | Taille max. 255 caractères
+| date | Timestamp | Non null
+| expiration | Timestamp |
+|===
+
+.Indexation
+[cols="1,1,2"]
+|===
+| *Nom du champ* | *Unique* | *Contraintes référencielles*
+| id | Y | Clé primaire
+| user_id | N | Clé référentielle vers `user.id`
+|===
