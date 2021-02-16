@@ -227,9 +227,9 @@ Le serveur envoie alors à tous les joueurs le message :
 
 .Message de lancement (serveur)
 :===
-Code:
-*0x21*:
-_uint8_t_:
+Code:Qui est J~1~:...:Qui est J~N~:Propriétaire(Case 1):Nb troupes(Case 1):...:P(Case(M)):NT(Case M)
+*0x21*:gamertag du J~1~:...:gamertag du J~N~:nombre entre 1 et N:Troupes sur la case:...: :
+_uint8_t_:string:...:string:_uint8_t_:_uint16_t_:...:_uint8_t:_uint16_t_
 :===
 
 .Erreurs
