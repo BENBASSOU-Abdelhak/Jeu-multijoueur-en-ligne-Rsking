@@ -12,7 +12,7 @@ build:
     - apt update && apt -y install g++ make autoconf cmake libboost-all-dev
   script:
     - mkdir build && cd build
-    - cmake ..
+    - cmake -DCMAKE_BUILD_TYPE=Debug ..
     - make
   artifacts:
     paths:
@@ -31,15 +31,23 @@ test:
     - make test
 
 #run coverage
-#gcov:
-#  stage: deploy
-#  before_script:
-#    - apt-get -qq update && apt-get -qq install -y make autoconf gcovr ggcov lcov
-#  script:
-#    - make clean && make GCOV=1 test
-#    - ./tests.sh
-#    - gcovr -s -f src/
-#  coverage: '/lines: \d+\.\d+/'
+coverage:
+  stage: deploy
+  before_script:
+    - export DEBIAN_FRONTEND=noninteractive
+    - ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
+    - apt update && apt install -y g++ make autoconf gcovr lcov cmake libboost-all-dev
+  script:
+    - cmake -DCOVERAGE=ON -DCMAKE_BUILD_TYPE=Debug .
+    - make all coverage
+    - make all coverage_html
+    - mv coverage_html coverage
+  artifacts:
+    paths:
+        - coverage/
+    expire_in: 7 days
+    reports:
+        cobertura: coverage.xml
 
 # generate documentation
 doc:
