@@ -23,12 +23,23 @@ build:
 test:
   stage: test
   before_script:
-    - apt update && apt -y install make cmake
+    - export DEBIAN_FRONTEND=noninteractive
+    - ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
+    - apt update && apt -y install make cmake python3-pip
+    - pip3 install lxml
   dependencies:
     - build
   script:
     - cd build
-    - make test
+    - ctest -T test --verbose --no-compress-output --output-on-failure
+  after_script:
+    - python3 CMakeModules/CTest2JUnit.py build CMakeModules/CTest2JUnit.xsl > junit.xml
+  artifacts:
+    paths:
+      - junit.xml
+    reports:
+      junit: junit.xml
+    expire_in: 7 days
 
 #run coverage
 coverage:

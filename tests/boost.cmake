@@ -1,5 +1,10 @@
 #All Boost::Test
 
+# Paramètres CTest
+set(CTEST_PARALLEL_LEVEL ${PROCESSORS})
+set(CTEST_OUTPUT_ON_FAILURE ON)
+
+
 set(ALL_TEST_NAMES)
 
 # Create test from .cpp
