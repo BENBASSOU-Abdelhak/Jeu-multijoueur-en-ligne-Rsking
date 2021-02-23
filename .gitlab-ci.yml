@@ -18,7 +18,7 @@ build:
     paths:
         - build/
     expire_in: 7 days
-  
+
 # run tests using the binary built
 test:
   stage: test
@@ -47,18 +47,21 @@ coverage:
   before_script:
     - export DEBIAN_FRONTEND=noninteractive
     - ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
-    - apt update && apt install -y g++ make autoconf gcovr lcov cmake libboost-all-dev
+    - apt update && apt install -y g++ make autoconf gcovr lcov cmake libboost-all-dev python3
   script:
     - cmake -DCOVERAGE=ON -DCMAKE_BUILD_TYPE=Debug .
     - make all coverage
     - make all coverage_html
     - mv coverage_html coverage
+    - chmod u+x utils/coverage_report.py
+    - python3 utils/coverage_report.py
   artifacts:
     paths:
         - coverage/
     expire_in: 7 days
     reports:
         cobertura: coverage.xml
+  coverage: '/COVERAGE PERCENTAGE: ([0-9.]+)/'
 
 # generate documentation
 doc:
