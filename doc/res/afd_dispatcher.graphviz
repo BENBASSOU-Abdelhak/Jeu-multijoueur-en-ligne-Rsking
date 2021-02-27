@@ -1,0 +1,9 @@
+digraph finite_state_machine {
+	rankdir=LR;
+	size="8,5"
+	node [shape = circle]
+	LobbyPoolDispatcher -> PoolDispatcher [label = "Crée/Rejoint salon"];
+	PoolDispatcher -> LobbyPoolDispatcher [label = "Quitte salon"];
+	PoolDispatcher -> GameDispatcher [label = "Lance la partie"];
+	GameDispatcher -> PoolDispatcher [label = "Partie finie"];
+}

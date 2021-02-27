@@ -54,10 +54,9 @@ doc:
   needs:
     - test
   before_script:
-    - gem install asciidoctor asciidoctor-pdf --pre
+    - gem install asciidoctor asciidoctor-pdf asciidoctor-diagram --pre
   script:
-    - make doc
-    - asciidoctor-pdf doc/*.adoc
+    - asciidoctor-pdf -r asciidoctor-diagram doc/*.adoc
   artifacts:
     paths:
       - "doc/*.pdf"

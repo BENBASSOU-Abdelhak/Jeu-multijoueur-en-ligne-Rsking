@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg height='149pt' preserveAspectRatio='xMidYMid meet' viewBox='0.00 0.00 576.00 148.74' width='576pt' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'>
+<g class='graph' id='graph0' transform='scale(0.66 0.66) rotate(0) translate(4 222.38)'>
+<title>finite_state_machine</title>
+<polygon fill='white' points='-4,4 -4,-222.38 872.65,-222.38 872.65,4 -4,4' stroke='transparent'/>
+
+<g class='node' id='node1'>
+<title>LobbyPoolDispatcher</title>
+<ellipse cx='109.19' cy='-109.19' fill='none' rx='109.38' ry='109.38' stroke='black'/>
+<text font-family='Times,serif' font-size='14.00' text-anchor='middle' x='109.19' y='-105.49'>LobbyPoolDispatcher</text>
+</g>
+
+<g class='node' id='node2'>
+<title>PoolDispatcher</title>
+<ellipse cx='467.62' cy='-109.19' fill='none' rx='81.49' ry='81.49' stroke='black'/>
+<text font-family='Times,serif' font-size='14.00' text-anchor='middle' x='467.62' y='-105.49'>PoolDispatcher</text>
+</g>
+
+<g class='edge' id='edge1'>
+<title>LobbyPoolDispatcher&#45;&gt;PoolDispatcher</title>
+<path d='M218.58,-109.19C268.97,-109.19 328.2,-109.19 376.14,-109.19' fill='none' stroke='black'/>
+<polygon fill='black' points='376.19,-112.69 386.19,-109.19 376.19,-105.69 376.19,-112.69' stroke='black'/>
+<text font-family='Times,serif' font-size='14.00' text-anchor='middle' x='302.38' y='-112.99'>Crée/Rejoint salon</text>
+</g>
+
+<g class='edge' id='edge2'>
+<title>PoolDispatcher&#45;&gt;LobbyPoolDispatcher</title>
+<path d='M387.99,-92.61C381.38,-91.64 374.78,-90.8 368.38,-90.19 309.98,-84.59 294.88,-85.81 236.38,-90.19 233.33,-90.42 230.24,-90.68 227.13,-90.96' fill='none' stroke='black'/>
+<polygon fill='black' points='226.72,-87.49 217.12,-91.96 227.42,-94.45 226.72,-87.49' stroke='black'/>
+<text font-family='Times,serif' font-size='14.00' text-anchor='middle' x='302.38' y='-93.99'>Quitte salon</text>
+</g>
+
+<g class='node' id='node3'>
+<title>GameDispatcher</title>
+<ellipse cx='780.26' cy='-109.19' fill='none' rx='88.28' ry='88.28' stroke='black'/>
+<text font-family='Times,serif' font-size='14.00' text-anchor='middle' x='780.26' y='-105.49'>GameDispatcher</text>
+</g>
+
+<g class='edge' id='edge3'>
+<title>PoolDispatcher&#45;&gt;GameDispatcher</title>
+<path d='M549.02,-109.19C589.55,-109.19 639.02,-109.19 681.7,-109.19' fill='none' stroke='black'/>
+<polygon fill='black' points='681.83,-112.69 691.83,-109.19 681.83,-105.69 681.83,-112.69' stroke='black'/>
+<text font-family='Times,serif' font-size='14.00' text-anchor='middle' x='620.37' y='-112.99'>Lance la partie</text>
+</g>
+
+<g class='edge' id='edge4'>
+<title>GameDispatcher&#45;&gt;PoolDispatcher</title>
+<path d='M693.44,-92.42C686.84,-91.52 680.26,-90.76 673.87,-90.19 626.5,-85.95 614.2,-85.65 566.87,-90.19 563.77,-90.49 560.62,-90.84 557.45,-91.23' fill='none' stroke='black'/>
+<polygon fill='black' points='556.69,-87.8 547.26,-92.61 557.64,-94.73 556.69,-87.8' stroke='black'/>
+<text font-family='Times,serif' font-size='14.00' text-anchor='middle' x='620.37' y='-93.99'>Partie finie</text>
+</g>
+</g>
+</svg>
