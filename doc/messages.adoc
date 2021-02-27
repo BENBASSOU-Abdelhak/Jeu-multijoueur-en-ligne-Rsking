@@ -54,6 +54,10 @@ Sous-code n°2:...
 :===
 ****
 
+#### Chaînes de caractères
+
+Les chaînes de caractères représentées par le type `std::string` seront encodées avec leur '\0' final afin de faciliter le parsing et marquer la séparation entre deux champs.
+
 <<<
 
 #### Erreurs
