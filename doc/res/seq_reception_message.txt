@@ -1,0 +1,27 @@
+title Réception d'un message
+
+activate Client
+Client->Dispatcher:send_message(code,data...)
+activate Dispatcher
+
+Dispatcher->Dispatcher:Cherche fonction\n associée à code
+activate Dispatcher
+Dispatcher->Module Logique:f(session, unpack(data))
+deactivate Dispatcher
+activate Module Logique
+Module Logique->Module Logique:Joue action
+activate Module Logique
+alt Erreur de logique
+Module Logique-->>Dispatcher:LogicException(code)
+activate Dispatcher
+Dispatcher-->Client:send_error(code=code,...)
+deactivate Dispatcher
+end
+
+Module Logique-->>Dispatcher:Informations logiques
+deactivate Module Logique
+deactivate Module Logique
+activate Dispatcher
+Dispatcher-->Client:send_message(code réponse, serialize(infos))
+deactivate Dispatcher
+deactivate Dispatcher

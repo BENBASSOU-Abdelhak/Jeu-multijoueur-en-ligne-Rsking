@@ -1,0 +1,23 @@
+title Initialisation de connexion WebSocket
+participant Client
+Listener->Listener:Listener(ioc, tcp::endpoint...)
+Listener->Listener:Listener.run()
+activate Listener
+Listener->Listener:Listener.do_accept()
+
+Client->Listener:TCP connect
+activate Client
+Listener->Listener:on_accept()
+activate Listener
+Listener->Session:Session(move(socket))->run()
+deactivate Listener
+
+activate Session
+Session->Session:on_run()
+
+Client->Session:WebSocket Hanshake
+Session->Session:on_accept()
+activate Session
+Session->Client:Accept WebSocket Handshake
+Session->Session:on_write()
+deactivate Session
