@@ -157,6 +157,8 @@ Code:Paramètres
 _uint8_t_:ci-dessus
 :===
 
+#### MAJ du salon
+
 À tous changement de la liste des joueurs, un message de MAJ sera envoyé aux joueurs du salon.
 
 .Message de MAJ salon (serveur)
@@ -247,6 +249,43 @@ _uint8_t_:string:...:string:_uint8_t_:_uint16_t_:...:_uint8_t:_uint16_t_
 0x20:Pas assez de joueurs
 :===
 ****
+
+<<<
+
+#### Fin de partie
+
+Afin d'augmenter la flexibilité, mais aussi pour faciliter le parsing, le serveur enverra un message pour signifier qu'une partie vient de se terminer.
+
+Ce message sera envoyé à tous les joueurs.
+
+IMPORTANT: Le client devra faire revenir tout joueur connecté dans le salon original.
+
+.Message partie terminée (serveur)
+:===
+Code:Gagnant
+*0x22*:Pseudo du joueur
+_uint8_t_:string
+:===
+
+<<<
+
+#### Joueur éliminé
+
+Pour signaler qu'un joueur a quitté la partie ou est mort, un message sera broadcast par le serveur.
+
+.Message joueur éliminé (serveur)
+:===
+Code:Joueur mort
+*0x23*:Pseudo du joueur
+_uint8_t_:string
+:===
+
+IMPORTANT: Les troupes d'un joueur mort resteront sur le jeu mais n'accepteront plus de renforts. +
+Ce sera aux autres joueurs de capturer les territoires.
+
+NOTE: Un joueur éliminé disposant encore de troupes ne pourra plus rejoindre la partie.
+
+NOTE: On pourra par exemple griser les territoires d'un tel joueur.
 
 <<<
 
