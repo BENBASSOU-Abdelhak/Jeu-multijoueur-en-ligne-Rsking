@@ -46,6 +46,12 @@ Il est vraiment important d'être exhaustifs afin de gagner du temps plus tard s
 
 Il faudra aussi proposer des *tests d'intégration* avec des faux clients !
 
+## Logging
+
+On notera au moins les erreurs et évènements importants dans des log via la link:https://www.boost.org/doc/libs/1_75_0/libs/log/doc/html/log/tutorial.html#log.tutorial.trivial[Librairie Boost::Log].
+
+Notamment sa partie *trivial logging* qui est simple à utiliser.
+
 <<<
 
 ## Architecture
