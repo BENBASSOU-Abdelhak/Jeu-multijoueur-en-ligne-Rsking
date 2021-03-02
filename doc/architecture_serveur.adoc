@@ -22,6 +22,16 @@ Les bibliothèques utilisées seront :
 
 La compilation sera simplifiée grâce à *CMake _3.13.4_* et les tests unitaires seront supervisés par CTest et codés avec *Boost::Test*.
 
+## Style de code
+
+On se basera sur le style du noyau Linux avec quelques modifications.
+
+Pour formater on pourra utiliser link:https://clang.llvm.org/docs/ClangFormatStyleOptions.html[clang-format] avec le fichier *_.clang-format_* à la racine.
+
+```
+clang-format -style=file -i [fichiers]
+```
+
 <<<
 
 ## Structure de fichiers
