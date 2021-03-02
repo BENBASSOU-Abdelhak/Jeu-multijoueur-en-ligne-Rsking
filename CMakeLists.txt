@@ -23,10 +23,10 @@ configure_file("${SRC_DIR}/configuration.h.in" "${INC_DIR}/configuration.h")
 
 # Main library, maybe split for faster compilation ??
 add_library(risking_lib)
-aux_source_directory(${SRC_DIR} SRC_LIST)
+file(GLOB_RECURSE SRC_LIST ${SRC_DIR}/*.cpp)
 list(REMOVE_ITEM SRC_LIST "${SRC_DIR}/main.cpp" "${SRC_DIR}/configuration.h.in")
 target_sources(risking_lib PUBLIC ${SRC_LIST})
-target_include_directories(risking PUBLIC ${INC_DIR})
+target_include_directories(risking_lib PUBLIC ${INC_DIR})
 
 target_link_libraries(risking risking_lib)
 
@@ -43,9 +43,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 
 # Boost
 find_package(Boost 1.67 REQUIRED COMPONENTS
-	system thread regex unit_test_framework)
+	system thread regex unit_test_framework log)
 target_include_directories(risking_lib PUBLIC ${Boost_INCLUDE_DIRS})
-target_link_libraries(risking_lib PUBLIC Boost::system Boost::thread Boost::regex)
+target_link_libraries(risking_lib PUBLIC Boost::system Boost::thread Boost::regex Boost::log)
 
 # Tests
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
