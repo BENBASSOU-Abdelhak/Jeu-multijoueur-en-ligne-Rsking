@@ -49,7 +49,7 @@ TIP: https://youtu.be/7S4CukCtYeM[Vidéo complète sur AJAX + PHP]
 
 #### Sécurité
 
-Afin d'assurer une authentification fiable et une sécurité relative des données le protocole sera WebSocket over SSL (**WSS**). https://tools.ietf.org/html/rfc6455[RFC 6455]
+Afin d'assurer une authentification fiable et une sécurité relative des données le protocole sera WebSocket over TLS (**WSS**). https://tools.ietf.org/html/rfc6455[RFC 6455]
 
 #### Client
 
