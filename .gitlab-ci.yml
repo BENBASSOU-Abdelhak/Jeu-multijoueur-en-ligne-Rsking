@@ -77,3 +77,6 @@ pages:
     paths:
       - "public/"
     expire_in: 7 days
+  only:
+    refs:
+      - develop
