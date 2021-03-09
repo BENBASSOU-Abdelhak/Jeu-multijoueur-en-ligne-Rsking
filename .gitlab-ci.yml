@@ -48,8 +48,8 @@ coverage:
       cobertura: coverage.xml
   coverage: '/COVERAGE PERCENTAGE: ([0-9.]+)/'
 
-# generate documentation
-doc:
+# Generate documentation (pdf)
+doc_pdf:
   stage: deploy
   needs:
     - test
@@ -60,4 +60,20 @@ doc:
   artifacts:
     paths:
       - "doc/*.pdf"
+    expire_in: 7 days
+
+# Upload to Gitlab pages (html)
+pages:
+  stage: deploy
+  needs:
+    - test
+  before_script:
+    - gem install asciidoctor asciidoctor-pdf asciidoctor-diagram --pre
+  script:
+    - asciidoctor doc/*.adoc
+    - mkdir -p public
+    - mv doc/*.html public/
+  artifacts:
+    paths:
+      - "public/"
     expire_in: 7 days
