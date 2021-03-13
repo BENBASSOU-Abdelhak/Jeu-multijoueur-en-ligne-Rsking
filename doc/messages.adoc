@@ -419,6 +419,7 @@ _uint8_t_:_uint16_t_:_uint16_t_:uint16_t
 0x60:Mauvaise case d'origine
 0x61:Mauvaise case de destination
 0x62:Nombre de troupes erroné
+0x63:Troupes déjà déplacées ce tour
 :===
 ****
 
