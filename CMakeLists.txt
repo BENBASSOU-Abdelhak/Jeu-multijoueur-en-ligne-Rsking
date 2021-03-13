@@ -25,7 +25,7 @@ configure_file("${SRC_DIR}/configuration.h.in" "${INC_DIR}/configuration.h")
 add_library(risking_lib)
 file(GLOB_RECURSE SRC_LIST ${SRC_DIR}/*.cpp)
 list(REMOVE_ITEM SRC_LIST "${SRC_DIR}/main.cpp" "${SRC_DIR}/configuration.h.in")
-target_sources(risking_lib PUBLIC ${SRC_LIST})
+target_sources(risking_lib PRIVATE ${SRC_LIST})
 target_include_directories(risking_lib PUBLIC ${INC_DIR})
 
 target_link_libraries(risking risking_lib)
@@ -46,6 +46,11 @@ find_package(Boost 1.67 REQUIRED COMPONENTS
 	system thread regex unit_test_framework log)
 target_include_directories(risking_lib PUBLIC ${Boost_INCLUDE_DIRS})
 target_link_libraries(risking_lib PUBLIC Boost::system Boost::thread Boost::regex Boost::log)
+
+# OpenSSL
+find_package(OpenSSL REQUIRED)
+target_include_directories(risking_lib PUBLIC ${OPENSSL_INCLUDE_DIR})
+target_link_libraries(risking_lib PRIVATE OpenSSL::SSL)
 
 # Tests
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

@@ -7,4 +7,8 @@
 #define VERSION_MAJOR @risking_VERSION_MAJOR@
 #define VERSION_MINOR @risking_VERSION_MINOR@
 
+#define PROG_NAME "Risking"
+#define mk_str(s) #s
+#define PROG_FULLNAME PROG_NAME mk_str(VERSION_MAJOR) "." mk_str(VERSION_MINOR)
+
 #endif

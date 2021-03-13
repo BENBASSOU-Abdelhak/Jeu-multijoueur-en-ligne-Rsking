@@ -4,7 +4,6 @@
 set(CTEST_PARALLEL_LEVEL ${PROCESSORS})
 set(CTEST_OUTPUT_ON_FAILURE ON)
 
-
 set(ALL_TEST_NAMES)
 
 # Create test from .cpp
@@ -13,6 +12,7 @@ function(create_test test_path)
 	add_executable(${name} ${test_path})
 	target_include_directories(${name} PUBLIC ${INC_DIR} ${Boost_INCLUDE_DIRS})
 	target_link_libraries(${name} PUBLIC risking_lib ${Boost_LIBRARIES})
+	add_dependencies(${name} risking_lib)
 
 	message("-- adding test: ${name}")
 	add_test(${name} ${name})
@@ -49,3 +49,7 @@ if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND COVERAGE)
 		EXCLUDE "tests/*"
 		DEPENDENCIES risking_lib ${ALL_TEST_NAMES})
 endif()
+
+add_custom_target(copy_test_certs
+	COMMAND cp "${TES_DIR}/*.cert" "${TES_DIR}/*.key" ./)
+add_dependencies(network_listener copy_test_certs)
