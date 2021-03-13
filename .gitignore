@@ -1,2 +1,15 @@
+# Fichiers "compiler"
 doc/*.pdf
 compile_commands.json
+
+# Générer par CLion
+.idea/
+CMakeFiles/
+Testing/
+cmake-build-debug/
+
+# Créer pour la compilation
+build/
+
+# Ignore all vscode folder
+**/.vscode/**
