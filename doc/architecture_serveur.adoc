@@ -294,7 +294,8 @@ Son interface comprend la fonction *join* correspondante à la fonction éponyme
 
 * parameters() const -> _GameParameters const&_: Renvoie les paramètres de ce Lobby.
 
-* *ban*(_Session const&_ origine, _std::string const&_ gamertag) : Origine banni un joueur du lobby.
+* *ban*(_Session const&_ origine, _std::string const&_ gamertag) -> Session& : Origine banni un joueur du lobby. +
+WARNING: retourne la session du joueur banni (ou exception si problème).
 
 * *exit*(_std::string const&_ gamertag) : le joueur quitte le lobby.
 
