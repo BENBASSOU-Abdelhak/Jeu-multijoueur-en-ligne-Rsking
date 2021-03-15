@@ -149,7 +149,7 @@ Le dispatcher recevra un message, le désérializera, et appellera la _fonction 
 Pour simplifier l'implémentation on utilisera un héritage avec plusieurs classes héritant de *Dispatcher* :
 
 * *LobbyPoolDispatcher* : Dispatcher associé à une LobbyPool.
-* *PoolDispatcher* : Dispatcher associé à _UN_ salon en particulier.
+* *LobbyDispatcher* : Dispatcher associé à _UN_ salon en particulier.
 * *GameDispatcher* : Dispatcher associé à _UNE_ partie en particulier.
 
 Chaque Dispatcher est lié à une *Session* et un objet logique, il change au cours du temps :
@@ -179,7 +179,7 @@ IMPORTANT: Un Dispatcher n'est pas responsable de son objet logique !
 |===
 |*Dispatcher* 2+|*Codes pouvant être reçus*
 |LobbyPoolDispatcher|0x10|0x12
-|PoolDispatcher|0x15|0x20
+|LobbyDispatcher|0x15|0x20
 |GameDispatcher 2+|_TOUT LE RESTE_
 |===
 
@@ -254,20 +254,23 @@ Une fois une partie lancée, les sessions seront attribuées à un *Dispatcher* 
 IMPORTANT: *LobbyPool* ne vérifie pas les JWT, ou l'origine des demandes. Il ne désérialize pas non plus les messages. +
 C'est le rôle de son Dispatcher et sa fonction associée !
 
-La *Session* doit être gardée en mémoire par *Pool* pour pouvoir faire des _broadcast_ à tout le salon, c'est un peu moche...
+IMPORTANT: *LobbyPool* sera un http://www.vishalchovatiya.com/singleton-design-pattern-in-modern-cpp/[Singleton]
 
 #### Interface
 
 Afin d'assurer ces fonctions on disposera des fonctions :
 
-* *LobbyPool*(_size_t_ max_lobbies) : crée une nouvelle poule avec un nombre de salon maximal.
+* *_private_* *LobbyPool*(_size_t_ max_lobbies) : crée une nouvelle poule avec un nombre de salon maximal.
+
+* get() -> LobbyPool& : Récupère l'instance de LobbyPool (voir http://www.vishalchovatiya.com/singleton-design-pattern-in-modern-cpp/[Singleton])
 
 * *create_lobby*(_Session&_ session, _std::string const&_ gamertag, _GameParameters const&_ params) -> _Lobby&_ : crée un nouveau salon associé à une session. +
-Renvoie l'ID du salon.
+Renvoie le salon créé salon.
 
-* *join_lobby*(_lobby_id_t_ lid, _Session&_ session, _std::string const&_ gamertag) : Le joueur rejoint un lobby existant.
+* *join_lobby*(_lobby_id_t_ lid, _Session&_ session, _std::string const&_ gamertag) -> _Lobby&_ : Le joueur rejoint un lobby existant. +
+Renvoie le salon rejoint.
 
-* *_private_* *destroy_lobby*(_lobby_id_t__ lid) : détruit un lobby. Seul le Lobby lui même peut appeller cette fonction.
+* *_private_* *destroy_lobby*(_lobby_id_t_ lid) : détruit un lobby. Seul le Lobby lui même peut appeller cette fonction.
 
 WARNING: Il faut penser à garder un lien vers le LobbyPool dans le Lobby pour pouvoir appeller *destroy_lobby*
 
@@ -286,6 +289,10 @@ Il stocke aussi la liste des joueurs bannis.
 Lorsqu'une partie est lancée l'état *started* est mis à _true_ et une partie est mise dans le _std::optional<Game>_.
 
 Son interface comprend la fonction *join* correspondante à la fonction éponyme de *LobbyPool* avec le _lobby_id_t_ en moins, mais aussi :
+
+* id() const -> _lobby_id_t_ : Renvoie l'id du lobby.
+
+* parameters() const -> _GameParameters const&_: Renvoie les paramètres de ce Lobby.
 
 * *ban*(_Session const&_ origine, _std::string const&_ gamertag) : Origine banni un joueur du lobby.
 
@@ -314,20 +321,20 @@ C'est ici que sont implémentées les règles du jeu.
 
 ##### Interface
 
-* *Game*(_GameParameters const&_ params, Lobby const& lobby) : Crée une partie avec certains paramètres et un Lobby.
+* *Game*(_GameParameters const&_ params, Lobby& lobby) : Crée une partie avec certains paramètres et un Lobby.
 
-* *add_troops*(_uint16_t_ dest_square, _uint16_t_ nb_troops) : Place des troupes sur une case.
+* *add_troops*(_Session const&_ player_asking, _uint16_t_ dest_square, _uint16_t_ nb_troops) : Place des troupes sur une case.
 
-* *attack*(_uint16_t_ src_square, _uint16_t_ dst_square, _uint16_t_ nb_troops) -> _struct atk_result_ : Attaque une case depuis une autre. +
+* *attack*(_Session const&_ player_asking, Session _uint16_t_ src_square, _uint16_t_ dst_square, _uint16_t_ nb_troops) -> _struct atk_result_ : Attaque une case depuis une autre. +
 Retourne une structure *atk_result* contenant le résultat de l'attaque.
 
-* *transfer*(_uint16_t_ src_square, _uint16_t_ dst_square, _uint16_t_ nb_troops) : Transfert des troupes.
+* *transfer*(_Session const&_ player_asking, _uint16_t_ src_square, _uint16_t_ dst_square, _uint16_t_ nb_troops) : Transfert des troupes.
 
-* *skip*() : Termine la phase actuelle.
+* *skip*(_Session const&_ player_asking) : Termine la phase actuelle.
 
 * *is_finshed*() -> bool : Indique si une partie est terminée.
 
-* *player_quit*(_std::string const&_ gamertag) : Le joueur a quitté la partie.
+* *player_quit*(_Session const&_ player_asking, _std::string const&_ gamertag) : Le joueur a quitté la partie.
 
 WARNING: On doit penser au cas où le joueur quitte la partie et penser à le kick du *Lobby*.
 
@@ -336,7 +343,7 @@ WARNING: On doit penser au cas où le joueur quitte la partie et penser à le ki
 On utilisera une structure *GameParameters* pour stocker les paramètres de la partie avant de la lancer.
 
 On pourra changer : +
-* *_Le nombre de joueurs_*, via `nb_player` +
+* *_Le nombre de joueurs_*, via `nb_players` +
 * *_L'ID de la map_*, via `id_map` +
 * *_Temps d'un tour (secondes)_* via `sec_by_turn`
 
