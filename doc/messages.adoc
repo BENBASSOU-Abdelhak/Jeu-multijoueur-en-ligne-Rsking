@@ -440,7 +440,7 @@ Le serveur enverra à tous les joueurs le message :
 .Message nouvelle phase (serveur)
 :===
 Code:Phase:Temps restant
-*0x71*:1 ou 2 ou 3:Le nombre de secondes restantes
+*0x71*:1 ou 2 ou 3:Le nombre de secondes restantes pour le reste du tour
 _uint8_t_:_uint8_t:_uint16_t_
 :===
 
