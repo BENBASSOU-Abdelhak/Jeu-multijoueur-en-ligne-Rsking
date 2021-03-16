@@ -350,6 +350,8 @@ NOTE: `Gamephase::Placement` / `Gamephase::Attack` / `Gamephase::Transfer`
 
 * *nb_alive*() const -> size_t : Nombre de joueurs en vie.
 
+* *winner() const -> _std::string const&_ : Gamertag du gagnant.
+
 WARNING: On doit penser au cas où le joueur quitte la partie et penser à le kick du *Lobby*.
 
 #### GameParameters
