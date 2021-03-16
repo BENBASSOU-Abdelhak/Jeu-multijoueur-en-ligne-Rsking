@@ -332,9 +332,22 @@ Retourne une structure *atk_result* contenant le résultat de l'attaque.
 
 * *skip*(_Session const&_ player_asking) : Termine la phase actuelle.
 
-* *is_finshed*() -> bool : Indique si une partie est terminée.
+* *end_turn*(Session const& player_asking) : Termine le tour courant.
+
+* *is_finshed*() const -> bool : Indique si une partie est terminée.
 
 * *player_quit*(_Session const&_ player_asking, _std::string const&_ gamertag) : Le joueur a quitté la partie.
+
+* *current_phase*() const -> _Gamephase_ : Phase actuelle (link:https://www.learncpp.com/cpp-tutorial/enum-classes/[enum class])
+NOTE: `Gamephase::Placement` / `Gamephase::Attack` / `Gamephase::Transfer`
+
+* *troop_gained*(Session const& session) const -> _size_t_ : Nombre de troupes à placer SI c'était la phase de placement de ce joueur.
+
+* *time_left*() const -> _uint16_t_ : Temps restant pour le tour en secondes.
+
+* *current_player*() const -> _std::string const&_ : Gamertag du joueur dont c'est le tour.
+
+* *nb_alive*() const -> size_t : Nombre de joueurs en vie.
 
 WARNING: On doit penser au cas où le joueur quitte la partie et penser à le kick du *Lobby*.
 
