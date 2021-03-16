@@ -168,18 +168,6 @@ Code:Joueur maître:Joueur 1:...:Joueur N
 _uint8_t_:string:string:...:string
 :===
 
-.Erreurs
-****
-:===
-*Sous-code*:Signification
-0x10:JWT incorrect
-0x11:ID de salon incorrect
-0x12:Salon déjà plein
-0x13:Partie déjà en cours
-0x14:Joueur exclu du salon
-:===
-****
-
 <<<
 
 #### Quitter ou Expulser du salon
@@ -214,8 +202,14 @@ _uint8_t_:string
 ****
 :===
 *Sous-code*:Signification
+0x10:JWT incorrect
+0x11:ID de salon incorrect
+0x12:Salon déjà plein
+0x13:Partie déjà en cours
+0x14:Joueur exclu du salon
 0x15:Le joueur n'a pas le droit d'expulser
 0x16:Le joueur n'existe pas dans ce salon
+0x17:Nombre maximum de salons atteint
 :===
 ****
 
