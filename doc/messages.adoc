@@ -300,25 +300,6 @@ Code:Joueur:Troupes
 _uint8_t_:string:_uint16_t_
 :===
 
-Un client peut aussi signaler qu'il veut terminer son tour.
-
-.Message fin de tour (client)
-:===
-Code:
-*0x31*:
-_uint8_t_:
-:===
-
-CAUTION: Si le temps de jeu est dépassé et que le joueur n'a pas placé de troupes, ses troupes seront placées au hasard.
-
-.Erreurs
-****
-:===
-*Sous-code*:Signification
-0x30:Ce n'est pas à votre tour
-:===
-****
-
 <<<
 
 #### Placer troupes
@@ -435,6 +416,8 @@ Code:
 *0x70*:
 _uint8_t_:
 :===
+
+CAUTION: Si le temps de jeu est dépassé et que le joueur n'a pas placé de troupes, ses troupes seront placées au hasard.
 
 Le serveur enverra à tous les joueurs le message :
 .Message nouvelle phase (serveur)
