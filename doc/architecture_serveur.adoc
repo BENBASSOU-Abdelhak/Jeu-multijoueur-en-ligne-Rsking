@@ -339,7 +339,7 @@ Retourne une structure *atk_result* contenant le résultat de l'attaque.
 
 * *player_quit*(_Session const&_ player_asking, _std::string const&_ gamertag) : Le joueur a quitté la partie.
 
-* *current_phase*() const -> _Gamephase_ : Phase actuelle (link:https://www.learncpp.com/cpp-tutorial/enum-classes/[enum class])
+* *current_phase*() const -> _Gamephase_ : Phase actuelle (link:https://www.learncpp.com/cpp-tutorial/enum-classes/[enum class]) +
 NOTE: `Gamephase::Placement` / `Gamephase::Attack` / `Gamephase::Transfer`
 
 * *troop_gained*(Session const& session) const -> _size_t_ : Nombre de troupes à placer SI c'était la phase de placement de ce joueur.
