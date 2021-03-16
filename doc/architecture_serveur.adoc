@@ -348,7 +348,9 @@ NOTE: `Gamephase::Placement` / `Gamephase::Attack` / `Gamephase::Transfer`
 
 * *current_player*() const -> _std::string const&_ : Gamertag du joueur dont c'est le tour.
 
-* *nb_alive*() const -> size_t : Nombre de joueurs en vie.
+* *nb_alive*() const -> _size_t_ : Nombre de joueurs en vie.
+
+* *last_dead*() const -> _std::string const&_ : Récupère le dernier joueur à être mort.
 
 WARNING: On doit penser au cas où le joueur quitte la partie et penser à le kick du *Lobby*.
 
