@@ -242,6 +242,7 @@ _uint8_t_:string:...:string:_uint8_t_:_uint16_t_:...:_uint8_t_:_uint16_t_
 :===
 *Sous-code*:Signification
 0x20:Pas assez de joueurs
+0x21:Pas le droit de lancer la partie
 :===
 ****
 
