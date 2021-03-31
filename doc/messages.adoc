@@ -420,7 +420,7 @@ Le serveur enverra à tous les joueurs le message :
 :===
 Code:Phase:Temps restant
 *0x71*:1 ou 2 ou 3:Le nombre de secondes restantes pour le reste du tour
-_uint8_t_:_uint8_t:_uint16_t_
+_uint8_t_:_uint8_t_:_uint16_t_
 :===
 
 - _1_ : Phase de déploiement
