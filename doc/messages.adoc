@@ -346,9 +346,9 @@ Le serveur répond alors à tous les clients
 
 .Message d'attaque (serveur)
 :===
-Code:Case d'origine:Case Destination:Nombre troupes:Résultat:Pertes:Dés
-*0x51*:ID case:ID case:Troupes à l'attaque:0 ou 1:Troupes perdues:Tableau des dés tirés
-_uint8_t_:_uint16_t_:_uint16_t_:_uint16_t_:_bool_:_uint16_t_:_uint8_t[]_
+Code:Case d'origine:Case Destination:Attaque gagnée:Troupes perdues (attaque):Troupes perdues (défense):Nb dés(atk):Dés(atk):Nb dés(def):Dés(def)
+*0x51*:ID case:ID case:1=W 0=L:Troupes perdues:Troupes perdues:Nombre dés:Tableau:Nombre dés:Tableau 
+_uint8_t_:_uint16_t_:_uint16_t_:_bool (1 octet)_:_uint16_t_:_uint16_t_:_uint16_t_:_uint8_t[]_:_uint16_t_:_uint8_t[]_
 :===
 
 Un résultat à 1 signifie une victoire, 0 signifie une défaite.
