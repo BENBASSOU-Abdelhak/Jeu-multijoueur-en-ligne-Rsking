@@ -9,6 +9,9 @@ if(NOT CMAKE_BUILD_TYPE)
 	message(NOTICE "-- CMAKE_BUILD_TYPE not provided, set to ${CMAKE_BUILD_TYPE}")
 endif()
 
+# Build test flag
+option(BUILD_TEST "Building test" ON)
+
 # directories
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
@@ -53,7 +56,7 @@ target_include_directories(risking_lib PUBLIC ${OPENSSL_INCLUDE_DIR})
 target_link_libraries(risking_lib PRIVATE OpenSSL::SSL)
 
 # Tests
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND BUILD_TEST)
 	include(CTest)
 endif()
 
@@ -63,6 +66,6 @@ endif()
 
 enable_testing()
 
-if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR RISKING_BUILD_TESTING) AND BUILD_TESTING)
+if((((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR RISKING_BUILD_TESTING) AND BUILD_TESTING)) AND BUILD_TEST)
 	include("${TES_DIR}/boost.cmake")
 endif()

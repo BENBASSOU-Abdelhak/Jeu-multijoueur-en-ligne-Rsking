@@ -80,3 +80,35 @@ pages:
   only:
     refs:
       - develop
+
+build_container:
+  stage: deploy
+  needs:
+    - test
+  image:
+    name: jonoh/docker-buildx-qemu
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    CACHE_TAG: $CI_REGISTRY_IMAGE/cache:$CI_COMMIT_REF_SLUG
+  services:
+    - name: docker:dind
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    # Use docker-container driver to allow useful features (push/multi-platform)
+    - docker buildx create --driver docker-container --use
+    - docker buildx inspect --bootstrap
+    # Pull previous image to populate build cache
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG || true
+  script:
+    # Important: Ensures execution of other binary formats is enabled in the kernel
+    - update-binfmts --enable
+    - docker buildx build --cache-from=type=registry,ref=$CACHE_TAG --cache-to=type=registry,ref=$CACHE_TAG,mode=max --platform linux/amd64,linux/arm/v7 -t $IMAGE_TAG --push --progress=plain .
+  interruptible: true
+  retry:
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+  tags:
+    - docker-privilegied
+
