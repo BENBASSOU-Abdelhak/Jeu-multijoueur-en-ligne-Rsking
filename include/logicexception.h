@@ -11,7 +11,7 @@ class LogicException : public std::logic_error
 	LogicException(uint8_t subcode, std::string const& what);
 	uint8_t subcode() const noexcept;
 
-private:
+    private:
 	uint8_t sc_;
 };
 

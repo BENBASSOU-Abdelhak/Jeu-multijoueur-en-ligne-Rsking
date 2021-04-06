@@ -2,8 +2,9 @@
 #include "network/session.h"
 #include "network/ssl.h"
 #include "network/fail.h"
-#include "network/lpd.h"
+#include "network/lobbypooldispatcher.h"
 
+#include "logic/lobbypool.h"
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
@@ -67,7 +68,7 @@ void Listener::on_accept(beast::error_code ec, tcp::socket socket)
 	} else {
 		BOOST_LOG_TRIVIAL(debug) << "client accepted";
 		// Create LobbyPoolDispatcher
-		std::unique_ptr<Dispatcher> lpd = std::make_unique<LobbyPoolDispatcher>();
+		std::unique_ptr<Dispatcher> lpd = std::make_unique<LobbyPoolDispatcher>(LobbyPool::get());
 		// Create the session and run it
 		std::make_shared<Session>(std::move(socket), std::move(lpd))->run();
 	}

@@ -1,7 +1,7 @@
 #include "network/session.h"
 #include "network/fail.h"
 #include "network/ssl.h"
-#include "network/lpd.h"
+#include "network/lobbypooldispatcher.h"
 #include "network/messages.h"
 
 #include "logicexception.h"
@@ -11,11 +11,16 @@
 #include <boost/log/trivial.hpp>
 #include <boost/asio/dispatch.hpp>
 
+#include <random>
+#include <chrono>
+
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http; // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+
+session_id_t gen_session_id();
 
 /* Aide :
  *
@@ -28,8 +33,14 @@ using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 */
 
 Session::Session(boost::asio::ip::tcp::socket&& socket, std::unique_ptr<Dispatcher>&& dis)
-	: wss_(std::move(socket), SSL_CONTEXT::get()), dispatcher_(std::move(dis))
+	: internal_id{ gen_session_id() }, wss_(std::move(socket), SslContext::get()), dispatcher_(std::move(dis))
 {
+	wss_.text(false);
+}
+
+Session::~Session()
+{
+	//TODO: prévenir que le client a quitté
 }
 
 void Session::run()
@@ -61,6 +72,9 @@ void Session::on_accept(beast::error_code ec)
 
 void Session::on_handshake(beast::error_code)
 {
+	// Turn off the timeout on the tcp_stream, because
+	// the websocket stream has its own timeout system.
+	beast::get_lowest_layer(wss_).expires_never();
 	// Set suggested timeout settings for the websocket
 	wss_.set_option(websocket::stream_base::timeout::suggested(beast::role_type::server));
 
@@ -77,18 +91,36 @@ void Session::do_read()
 	wss_.async_read(buffer_, beast::bind_front_handler(&Session::on_read, shared_from_this()));
 }
 
-void Session::do_write(std::vector<char>&& buf)
+void Session::send(std::vector<char> const& data)
 {
-	decltype(auto) wd = to_write_.prepare(buf.size());
-	std::copy(buf.cbegin(), buf.cend(), static_cast<char*>(wd.data()));
-	wss_.async_write(wd, beast::bind_front_handler(&Session::on_write, shared_from_this()));
+	// Post our work to the strand, this ensures
+	// that the members of `this` will not be
+	// accessed concurrently.
+	auto pt = std::make_shared<std::remove_const_t<std::remove_reference_t<decltype(data)>>>(data);
+	net::post(wss_.get_executor(), beast::bind_front_handler(&Session::on_send, shared_from_this(), std::move(pt)));
+}
+
+void Session::on_send(std::shared_ptr<std::vector<char>> const& buf)
+{
+	// Always add to queue
+	queue_.push_back(buf);
+
+	// Are we already writing?
+	if (queue_.size() > 1)
+		return;
+
+	// We are not currently writing, so send this immediately
+	wss_.async_write(net::buffer(*queue_.front()),
+			 beast::bind_front_handler(&Session::on_write, shared_from_this()));
 }
 
 void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 {
 	// This indicates that the session was closed
-	if (ec == websocket::error::closed)
+	if (ec == websocket::error::closed) {
+		BOOST_LOG_TRIVIAL(debug) << "WSS session closed";
 		return;
+	}
 
 	if (ec)
 		fail(ec, "read");
@@ -99,8 +131,8 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 	} else {
 		BOOST_LOG_TRIVIAL(debug) << "Received: " << bytes_transferred << " bytes";
 		unserialize(bytes_transferred);
-		do_read();
 	}
+	do_read();
 }
 
 void Session::on_write(beast::error_code ec, std::size_t bytes_transferred)
@@ -108,9 +140,14 @@ void Session::on_write(beast::error_code ec, std::size_t bytes_transferred)
 	if (ec)
 		return fail(ec, "write");
 
+	// Remove the string from the queue
+	queue_.erase(queue_.begin());
 	BOOST_LOG_TRIVIAL(debug) << "sent " << bytes_transferred << "bytes";
-	to_write_.commit(bytes_transferred);
-	to_write_.consume(bytes_transferred);
+
+	// Send the next message if any
+	if (!queue_.empty())
+		wss_.async_write(net::buffer(*queue_.front()),
+				 beast::bind_front_handler(&Session::on_write, shared_from_this()));
 }
 
 void Session::change_dispatcher(std::unique_ptr<Dispatcher>&& dispatcher)
@@ -129,4 +166,24 @@ void Session::unserialize(size_t bytes_transferred)
 	data = buffer_.cdata();
 
 	buffer_.consume(dispatcher_->dispatch(code, *this, data, bytes_transferred - 1));
+}
+
+// lobby_id_t
+session_id_t gen_session_id()
+{
+	// TODO: génération globale et sécurisée.
+	static std::mt19937_64 gen{ static_cast<unsigned>(
+		std::chrono::system_clock::now().time_since_epoch().count()) };
+	static std::uniform_int_distribution<session_id_t> dis;
+	return dis(gen);
+}
+
+bool operator==(Session const& lhs, Session const& rhs)
+{
+	return lhs.internal_id == rhs.internal_id;
+}
+
+bool operator!=(Session const& lhs, Session const& rhs)
+{
+	return !(lhs == rhs);
 }
