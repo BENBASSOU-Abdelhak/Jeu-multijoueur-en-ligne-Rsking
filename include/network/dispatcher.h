@@ -5,9 +5,11 @@
 
 /* Classe Dispatcher générique */
 
-class Dispatcher {
-	public:
-	virtual size_t dispatch(uint8_t code, Session& session, boost::asio::const_buffer& buf, size_t bytes_transferred)=0;
+class Dispatcher
+{
+    public:
+	virtual size_t dispatch(uint8_t code, Session& session, boost::asio::const_buffer const& buf,
+				size_t bytes_transferred) = 0;
 };
 
 #endif

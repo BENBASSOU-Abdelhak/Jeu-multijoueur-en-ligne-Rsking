@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(bad_certificate)
 {
 	try {
 		boost::filesystem::rename("certificate.cert", "tmp.cert");
-		SSL_CONTEXT::get();
+		SslContext::get();
 		BOOST_TEST(false);
 	} catch (std::runtime_error const& e) {
 	}
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(bad_primary_key)
 {
 	try {
 		boost::filesystem::rename("pri.key", "tmp.key");
-		SSL_CONTEXT::get();
+		SslContext::get();
 		BOOST_TEST(false);
 	} catch (std::runtime_error const& e) {
 	}
@@ -33,9 +33,8 @@ BOOST_AUTO_TEST_CASE(bad_primary_key)
 BOOST_AUTO_TEST_CASE(test_certificates)
 {
 	try {
-		SSL_CONTEXT::get();
+		SslContext::get();
 	} catch (std::runtime_error const& e) {
 		BOOST_TEST(false);
 	}
 }
-

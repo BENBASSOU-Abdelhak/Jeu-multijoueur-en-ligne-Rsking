@@ -9,7 +9,7 @@
 
 #include <boost/asio/ssl.hpp>
 
-class SSL_CONTEXT
+class SslContext
 {
     public:
 	static boost::asio::ssl::context& get();
@@ -22,8 +22,8 @@ class SSL_CONTEXT
 		 * @param path_to_certificate chemin vers le certificat (PEM)
 		 * @param path_to_key chemin vers la clé liée au certificat (PEM)
 		 */
-	SSL_CONTEXT(boost::asio::ssl::context::method method, std::string const& path_to_certificate,
-		    std::string const& path_to_key);
+	SslContext(boost::asio::ssl::context::method method, std::string const& path_to_certificate,
+		   std::string const& path_to_key);
 
 	boost::asio::ssl::context ctx_;
 };

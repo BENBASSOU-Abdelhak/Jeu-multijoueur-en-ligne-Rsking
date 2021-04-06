@@ -7,13 +7,18 @@
 #include "network/listener.h"
 #include "network/session.h"
 #include "network/dispatcher.h"
-#include <network/lpd.h>
+#include "network/lobbypooldispatcher.h"
+#include "logic/lobbypool.h"
 
 #include <boost/beast/websocket.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/thread.hpp>
 #include <boost/log/trivial.hpp>
+
+#include "configuration.h"
+#include <openssl/ssl.h>
+#include "../utils/ssl_injection.cpp"
 
 #include <thread>
 #include <chrono>
@@ -28,8 +33,8 @@ constexpr unsigned short PORT = 42424;
 class Mock_dispatcher : public Dispatcher
 {
     public:
-	size_t dispatch(uint8_t code, Session& session, boost::asio::const_buffer& buf,
-		      size_t bytes_transferred) override
+	size_t dispatch(uint8_t code, Session& session, boost::asio::const_buffer const& buf,
+			size_t bytes_transferred) override
 	{
 		uint16_t c = code;
 		BOOST_LOG_TRIVIAL(debug)
@@ -40,20 +45,21 @@ class Mock_dispatcher : public Dispatcher
 		boost::ignore_unused(session);
 		return bytes_transferred;
 	}
-	static boost::asio::const_buffer* buf_;
+	static boost::asio::const_buffer const* buf_;
 	static uint8_t code_;
 	static size_t bytes_transferred_;
 };
-boost::asio::const_buffer* Mock_dispatcher::buf_ = nullptr;
+boost::asio::const_buffer const* Mock_dispatcher::buf_ = nullptr;
 uint8_t Mock_dispatcher::code_ = 0;
 size_t Mock_dispatcher::bytes_transferred_ = 0;
 
-// écrase le code de la lib
-size_t LobbyPoolDispatcher::dispatch(uint8_t code, Session& session, boost::asio::const_buffer& buf,
-				   size_t bytes_transferred)
+// override
+size_t LobbyPoolDispatcher::dispatch(uint8_t code, Session& session, boost::asio::const_buffer const& buf,
+				     size_t bytes_transferred)
 {
 	uint16_t c = code;
-	BOOST_LOG_TRIVIAL(debug) << "received message of " << bytes_transferred << "bytes with code 0x" << std::hex << c;
+	BOOST_LOG_TRIVIAL(debug)
+		<< "received message of " << bytes_transferred << "bytes with code 0x" << std::hex << c;
 	session.change_dispatcher(std::make_unique<Mock_dispatcher>());
 	boost::ignore_unused(buf);
 	return bytes_transferred;
@@ -77,6 +83,8 @@ void setup(std::shared_ptr<io_context>& io, std::shared_ptr<Listener>& lp, std::
 
 	sctx = std::make_shared<ssl::context>(ssl::context::tls_client);
 	wss_s = std::make_shared<wss_stream>(*io, *sctx);
+	wss_s->text(false);
+	SSL_CTX_set_keylog_callback(sctx->native_handle(), dump_keys);
 }
 
 BOOST_AUTO_TEST_CASE(constructor, *boost::unit_test::timeout(1))
@@ -164,15 +172,15 @@ BOOST_AUTO_TEST_CASE(wss_exchange, *boost::unit_test::timeout(1))
 
 	// tests des valeurs
 	BOOST_TEST(Mock_dispatcher::code_ == code);
-	BOOST_TEST(Mock_dispatcher::bytes_transferred_ == vect.size() -1);
+	BOOST_TEST(Mock_dispatcher::bytes_transferred_ == vect.size() - 1);
 
 	const unsigned char* raw = static_cast<const unsigned char*>(Mock_dispatcher::buf_->data());
-	for (size_t i = 0; i < vect.size()-1; ++i) {
-		BOOST_TEST(raw[i] == vect[i+1]);
+	for (size_t i = 0; i < vect.size() - 1; ++i) {
+		BOOST_TEST(raw[i] == vect[i + 1]);
 	}
 }
 
-BOOST_AUTO_TEST_CASE(wss_empty_message/*, *boost::unit_test::timeout(1)*/)
+BOOST_AUTO_TEST_CASE(wss_empty_message, *boost::unit_test::timeout(1))
 {
 	std::shared_ptr<io_context> ioc;
 	std::shared_ptr<Listener> lp;
@@ -216,15 +224,28 @@ BOOST_AUTO_TEST_CASE(wss_empty_message/*, *boost::unit_test::timeout(1)*/)
 	const unsigned char* raw = static_cast<const unsigned char*>(dt.data());
 	uint8_t code = raw[0];
 	uint8_t subcode = raw[1];
-	std::string msg {raw + 2, raw + read-1}; // pas de \0 en fin
+	std::string msg{ raw + 2, raw + read - 1 }; // pas de \0 en fin
 
 	// tests
 	BOOST_TEST(code == 0);
 	BOOST_TEST(subcode == 0);
-	BOOST_TEST(msg == std::string{"message vide"});
+	BOOST_TEST(msg == std::string{ "message vide" });
 
-	std::vector<unsigned char> expected {0x0, 0x0, 'm','e','s','s','a','g','e',' ','v','i','d','e','\0'};
+	std::vector<unsigned char> expected{
+		0x0, 0x0, 'm', 'e', 's', 's', 'a', 'g', 'e', ' ', 'v', 'i', 'd', 'e', '\0'
+	};
 	std::vector<unsigned char> got;
 	std::copy(raw, raw + read, std::back_inserter(got));
 	BOOST_TEST(expected == got, boost::test_tools::per_element());
+}
+
+BOOST_AUTO_TEST_CASE(session_cmp, *boost::unit_test::timeout(1))
+{
+	io_context ctx{ 1 };
+	auto s1 = std::make_shared<Session>(boost::asio::ip::tcp::socket{ ctx },
+					    std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
+	auto s2 = std::make_shared<Session>(boost::asio::ip::tcp::socket{ ctx },
+					    std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
+
+	BOOST_CHECK(*s1 != *s2);
 }

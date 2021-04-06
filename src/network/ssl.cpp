@@ -3,14 +3,14 @@
 
 namespace ssl = boost::asio::ssl;
 
-boost::asio::ssl::context& SSL_CONTEXT::get()
+boost::asio::ssl::context& SslContext::get()
 {
-	static SSL_CONTEXT inst{ ssl::context::tls_server, "certificate.cert", "pri.key" };
+	static SslContext inst{ ssl::context::tls_server, "certificate.cert", "pri.key" };
 	return inst.ctx_;
 }
 
-SSL_CONTEXT::SSL_CONTEXT(ssl::context::method method, std::string const& path_to_certificate,
-			 std::string const& path_to_key)
+SslContext::SslContext(ssl::context::method method, std::string const& path_to_certificate,
+		       std::string const& path_to_key)
 	: ctx_{ method }
 {
 	boost::system::error_code ec;
