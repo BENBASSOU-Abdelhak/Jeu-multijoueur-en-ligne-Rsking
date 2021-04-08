@@ -36,7 +36,7 @@ class Game
 
 	Gamephase current_phase() const;
 
-	uint16_t troop_gained(Session const& session) const;
+	uint16_t troop_gained() const;
 
 	uint16_t time_left() const;
 

@@ -25,7 +25,8 @@ size_t deflate(raw_type const& buf, size_t left, bool& b);
 
 size_t unserialize(raw_type, size_t);
 
-template <typename T, typename... Args> size_t unserialize(raw_type buf, size_t size, T& param, Args&... args)
+template <typename T, typename... Args>
+size_t unserialize(raw_type buf, size_t size, T& param, Args&... args)
 {
 	const auto read = deflate(buf, size, param);
 	buf += read;

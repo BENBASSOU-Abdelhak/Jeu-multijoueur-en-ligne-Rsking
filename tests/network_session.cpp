@@ -239,13 +239,10 @@ BOOST_AUTO_TEST_CASE(wss_empty_message, *boost::unit_test::timeout(1))
 	BOOST_TEST(expected == got, boost::test_tools::per_element());
 }
 
-BOOST_AUTO_TEST_CASE(session_cmp, *boost::unit_test::timeout(1))
-{
-	io_context ctx{ 1 };
-	auto s1 = std::make_shared<Session>(boost::asio::ip::tcp::socket{ ctx },
-					    std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
-	auto s2 = std::make_shared<Session>(boost::asio::ip::tcp::socket{ ctx },
-					    std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
+BOOST_AUTO_TEST_CASE(session_cmp, *boost::unit_test::timeout(1)) {
+	io_context ctx{1};
+	auto s1 = std::make_shared<Session>(boost::asio::ip::tcp::socket{ctx}, std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
+	auto s2 = std::make_shared<Session>(boost::asio::ip::tcp::socket{ctx}, std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
 
 	BOOST_CHECK(*s1 != *s2);
 }

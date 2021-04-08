@@ -1,9 +1,18 @@
-#ifndef __LOBBYPOOL__
-#define __LOBBYPOOL__
+#ifndef INCLUDE__LOGIC__LOBBYPOOL_H
+#define INCLUDE__LOGIC__LOBBYPOOL_H
+
+/*
+ * Classe LobbyPool
+ */
 
 #include "lobby.h"
 #include <random>
 #include <limits>
+
+#include <string>
+
+using lobby_id_t = uint64_t;
+struct Session;
 
 class LobbyPool
 {

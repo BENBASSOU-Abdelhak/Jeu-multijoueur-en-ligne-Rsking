@@ -14,7 +14,8 @@
 /* Foward declarations */
 
 // Fonction d'arrêt
-template <typename T> void create_buf(T&);
+template <typename T>
+void create_buf(T&);
 
 // Fonction générique
 template <typename Stream, typename T, typename... Args, typename = std::enable_if_t<sizeof...(Args) != 0>>
@@ -26,12 +27,18 @@ template <typename Stream, typename Basic_Type,
 void create_buf(Stream& sbuf, Basic_Type&& param);
 
 /* Spécialisation */
-template <typename Stream> void create_buf(Stream& sbuf, std::string const& str);
-template <typename Stream> void create_buf(Stream& sbuf, atk_result const& res);
-template <typename Stream, typename T> void create_buf(Stream& sbuf, std::vector<T> const& vect);
-template <typename Stream> void create_buf(Stream& sbuf, Lobby const& lobby);
-template <typename Stream> void create_buf(Stream& sbuf, Game const& game);
-template <typename Stream> void create_buf(Stream& sbuf, Map const& map);
+template <typename Stream>
+void create_buf(Stream& sbuf, std::string const& str);
+template <typename Stream>
+void create_buf(Stream& sbuf, atk_result const& res);
+template <typename Stream, typename T>
+void create_buf(Stream& sbuf, std::vector<T> const& vect);
+template <typename Stream>
+void create_buf(Stream& sbuf, Lobby const& lobby);
+template <typename Stream>
+void create_buf(Stream& sbuf, Game const& game);
+template <typename Stream>
+void create_buf(Stream& sbuf, Map const& map);
 
 // crée un buffer (endianness)
 template <typename Stream, typename Basic_Type, typename /*= std::enable_if_t<sizeof...(Args) != 0>*/>
@@ -43,7 +50,8 @@ void create_buf(Stream& sbuf, Basic_Type&& param)
 }
 
 // crée buffer (string)
-template <typename Stream> void create_buf(Stream& sbuf, std::string const& str)
+template <typename Stream>
+void create_buf(Stream& sbuf, std::string const& str)
 {
 	for (decltype(auto) c : str)
 		create_buf(sbuf, c);
@@ -51,7 +59,8 @@ template <typename Stream> void create_buf(Stream& sbuf, std::string const& str)
 }
 
 // crée un buffer (fin)
-template <typename T> void create_buf(T&)
+template <typename T>
+void create_buf(T&)
 {
 }
 
@@ -67,7 +76,8 @@ void create_buf(Stream& sbuf, T&& param, Args&&... params)
  * Spécialisations
  */
 // sérialize atk_result
-template <typename Stream> void create_buf(Stream& sbuf, atk_result const& res)
+template <typename Stream>
+void create_buf(Stream& sbuf, atk_result const& res)
 {
 	create_buf(sbuf, static_cast<uint8_t>(res.square_conquered ? 1 : 0));
 	create_buf(sbuf, res.nb_lost_troops_from_attacker, res.nb_lost_troops_from_defender);
@@ -76,21 +86,24 @@ template <typename Stream> void create_buf(Stream& sbuf, atk_result const& res)
 }
 
 // crée buffer (vector)
-template <typename Stream, typename T> void create_buf(Stream& sbuf, std::vector<T> const& vect)
+template <typename Stream, typename T>
+void create_buf(Stream& sbuf, std::vector<T> const& vect)
 {
 	for (T const& val : vect)
 		create_buf(sbuf, val);
 }
 
 // sérialize Lobby
-template <typename Stream> void create_buf(Stream& sbuf, Lobby const& lobby)
+template <typename Stream>
+void create_buf(Stream& sbuf, Lobby const& lobby)
 {
 	auto view = lobby.all_players();
 	std::for_each(view.first, view.second, [&sbuf](auto const& e) { create_buf(sbuf, e); });
 }
 
 // sérialize Game
-template <typename Stream> void create_buf(Stream& sbuf, Game const& game)
+template <typename Stream>
+void create_buf(Stream& sbuf, Game const& game)
 {
 	//TODO: vérifier que l'odre des joueurs est bon
 	create_buf(sbuf, game.lobby());
@@ -98,7 +111,8 @@ template <typename Stream> void create_buf(Stream& sbuf, Game const& game)
 }
 
 // sérialize Map
-template <typename Stream> void create_buf(Stream& sbuf, Map const& map)
+template <typename Stream>
+void create_buf(Stream& sbuf, Map const& map)
 {
 	//TODO: vérifier que Karim a update avec des ID
 	for (info_square is : map.m_info_square) {
@@ -108,13 +122,15 @@ template <typename Stream> void create_buf(Stream& sbuf, Map const& map)
 }
 
 // sérialize GameParameters
-template <typename Stream> void create_buf(Stream& sbuf, GameParameters const& gp)
+template <typename Stream>
+void create_buf(Stream& sbuf, GameParameters const& gp)
 {
 	create_buf(sbuf, gp.nb_players, gp.id_map, gp.sec_by_turn);
 }
 
 // Envoi un message
-template <typename T, typename... Args> void send_message(Session& session, T&& param, Args&&... params)
+template <typename T, typename... Args>
+void send_message(Session& session, T&& param, Args&&... params)
 {
 	std::vector<char> buf;
 	create_buf(buf, std::forward<T&&>(param), std::forward<Args&&>(params)...);
@@ -127,7 +143,9 @@ inline void send_error(Session& session, uint8_t subcode, std::string const& mes
 	send_message(session, static_cast<uint8_t>(0), subcode, message);
 }
 
-template <typename T, typename... Args> void broadcast(Lobby const& lobby, T&& param, Args&&... params)
+struct Lobby;
+template <typename T, typename... Args>
+void broadcast(Lobby const& lobby, T&& param, Args&&... params)
 {
 	std::vector<char> buf;
 	create_buf(buf, std::forward<T&&>(param), std::forward<Args&&>(params)...);

@@ -1,5 +1,5 @@
-#ifndef __LOBBY__
-#define __LOBBY__
+#ifndef INCLUDE__LOGIC__LOBBY_H
+#define INCLUDE__LOGIC__LOBBY_H
 
 #include <string>
 #include <map>
@@ -41,7 +41,8 @@ class Lobby
 
 	~Lobby() = default;
 
-	template <typename T, typename... Args> friend void broadcast(Lobby const& lobby, T&& param, Args&&... params);
+	template <typename T, typename... Args>
+	friend void broadcast(Lobby const& lobby, T&& param, Args&&... params);
 
     private:
 	lobby_id_t m_id;
