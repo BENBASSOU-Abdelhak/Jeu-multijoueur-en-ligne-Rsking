@@ -16,51 +16,53 @@ __attribute__((weak)) Lobby& Game::lobby() const
 __attribute__((weak)) Game::Game(GameParameters const&, Lobby& l) : m_lobby(l)
 {
 }
-void Game::add_troups(const Session& player_asking, uint16_t dst_square, uint16_t nb_troops)
+__attribute__((weak)) void Game::add_troups(const Session& player_asking, uint16_t dst_square, uint16_t nb_troops)
 {
 }
-atk_result Game::attack(const Session& player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops)
+__attribute__((weak)) atk_result Game::attack(const Session& player_asking, uint16_t src_square, uint16_t dst_square,
+					      uint16_t nb_troops)
 {
 	return atk_result{ true, true, 1, 1, { 1 }, { 1 } };
 }
-void Game::transfer(const Session& player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops)
+__attribute__((weak)) void Game::transfer(const Session& player_asking, uint16_t src_square, uint16_t dst_square,
+					  uint16_t nb_troops)
 {
 }
-void Game::skip(const Session& player_asking)
+__attribute__((weak)) void Game::skip(const Session& player_asking)
 {
 }
-Gamephase Game::current_phase() const
+__attribute__((weak)) Gamephase Game::current_phase() const
 {
 	return Gamephase::Placement;
 }
-size_t Game::nb_alive() const
+__attribute__((weak)) size_t Game::nb_alive() const
 {
 	return 2;
 }
-bool Game::is_finished() const
+__attribute__((weak)) bool Game::is_finished() const
 {
 	return false;
 }
-uint16_t Game::time_left() const
+__attribute__((weak)) uint16_t Game::time_left() const
 {
 	return 42;
 }
-std::string const& Game::last_dead() const
+__attribute__((weak)) std::string const& Game::last_dead() const
 {
 	static std::string c{ "bouchon_last_dead" };
 	return c;
 }
-std::string const& Game::current_player() const
+__attribute__((weak)) std::string const& Game::current_player() const
 {
 	static std::string c{ "bouchon_current_player" };
 	return c;
 }
-std::string const& Game::winner() const
+__attribute__((weak)) std::string const& Game::winner() const
 {
 	static std::string c{ "bouchon_winner" };
 	return c;
 }
-uint16_t Game::troop_gained(Session const&) const
+__attribute__((weak)) uint16_t Game::troop_gained() const
 {
 	return 69;
 }

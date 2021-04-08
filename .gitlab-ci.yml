@@ -16,6 +16,8 @@ test:
   stage: test
   needs:
     - build
+  before_script:
+    - apt update && apt -y install libssl-dev
   script:
     - cd build
     - ctest -T test --verbose --no-compress-output --output-on-failure
@@ -33,6 +35,8 @@ coverage:
   stage: deploy
   needs:
     - test
+  before_script:
+    - apt update && apt -y install libssl-dev
   script:
     - cmake -DCOVERAGE=ON -DCMAKE_BUILD_TYPE=Debug .
     - make all coverage

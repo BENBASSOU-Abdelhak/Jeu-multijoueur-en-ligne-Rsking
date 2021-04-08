@@ -160,7 +160,7 @@ NOTE: *Dispatcher* sera donc une classe abstraite.
 
 ##### Interface
 
-* *dispatch*(uint8_t code, Session& session,  beast::asio::mutable_buffer& buffer) -> size_t : dispatch les arguments reçus à la bonne fonction logique. +
+* *dispatch*(_uint8_t_ code, _Session&_ session,  _beast::asio::const_buffer const&_ buffer) -> _size_t_ : dispatch les arguments reçus à la bonne fonction logique. +
 WARNING: Renvoie le nombre de bits lus.
 
 #### Fonction de dispatch

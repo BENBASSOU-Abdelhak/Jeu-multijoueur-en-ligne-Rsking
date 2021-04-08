@@ -47,10 +47,10 @@ size_t LobbyDispatcher::kick_player(Session& session, boost::asio::const_buffer 
 
 	try {
 		Session& kicked = lb_.ban(session, gtag);
-		kicked.change_dispatcher(std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
 		send_message(kicked, static_cast<uint8_t>(0x16), "Vous avez été kick du salon");
 
 		broadcast(lb_, static_cast<uint8_t>(0x14), lb_);
+		kicked.change_dispatcher(std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
 
 	} catch (LogicException const& e) {
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in Lobby::ban";
@@ -72,10 +72,9 @@ size_t LobbyDispatcher::start_game(Session& session, boost::asio::const_buffer c
 
 	try {
 		Game& new_game = lb_.start_game(session);
-		session.change_dispatcher(std::make_unique<GameDispatcher>(new_game));
-
 		broadcast(lb_, static_cast<uint8_t>(0x21), new_game);
 
+		session.change_dispatcher(std::make_unique<GameDispatcher>(new_game));
 	} catch (LogicException const& e) {
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in Lobby::start_game";
 		//TODO: ban

@@ -23,7 +23,6 @@ Lobby const& LobbyPool::getLobby(lobby_id_t id) const
 	return m_lobby_list.at(id);
 }
 
-
 __attribute__((weak)) Lobby& LobbyPool::create_lobby(Session& session, std::string const& gamertag,
 						     GameParameters const& params)
 {

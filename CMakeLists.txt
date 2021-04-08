@@ -22,6 +22,10 @@ add_executable(risking)
 target_sources(risking PUBLIC "${SRC_DIR}/main.cpp")
 
 # configuration file
+option(DUMP_SSL_SECRETS "DUMP SSL secrets for debugging" OFF)
+if (DUMP_SSL_SECRETS)
+	message(WARNING "-- Dumping SSL secrets is unsecure")
+endif()
 configure_file("${SRC_DIR}/configuration.h.in" "${INC_DIR}/configuration.h")
 
 # Main library, maybe split for faster compilation ??

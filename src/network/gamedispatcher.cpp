@@ -146,11 +146,11 @@ size_t GameDispatcher::next_phase(Session& session, boost::asio::const_buffer co
 	}
 
 	try {
-		Gamephase cp = game_.current_phase();
 		game_.skip(session);
+		Gamephase cp = game_.current_phase();
 		if (cp == Gamephase::Placement) { // nouveau tour
 			broadcast(game_.lobby(), static_cast<uint8_t>(0x30), game_.current_player(),
-				  game_.troop_gained(session));
+				  game_.troop_gained());
 		} else { // même tour
 			broadcast(game_.lobby(), static_cast<uint8_t>(0x71),
 				  static_cast<uint8_t>(game_.current_phase()), game_.time_left());

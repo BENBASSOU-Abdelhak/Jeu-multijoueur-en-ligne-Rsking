@@ -118,3 +118,4 @@ SpacesInSquareBrackets: false
 Standard: c++17 # Modifié 03 -> 17
 TabWidth: 8
 UseTab: Always
+AlwaysBreakTemplateDeclarations: Yes # Of course

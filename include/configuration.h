@@ -8,7 +8,9 @@
 #define VERSION_MINOR 1
 
 #define PROG_NAME "Risking"
-#define mk_str(s) #s
-#define PROG_FULLNAME PROG_NAME mk_str(VERSION_MAJOR) "." mk_str(VERSION_MINOR)
+#define PROG_FULLNAME PROG_NAME " v0.1"
+
+// options
+#define DUMP_SSL_SECRETS ON
 
 #endif

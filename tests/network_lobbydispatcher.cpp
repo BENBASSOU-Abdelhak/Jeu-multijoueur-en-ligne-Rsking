@@ -37,7 +37,8 @@ struct Mocks {
 Mocks* cur_mock = nullptr;
 
 /* stubs */
-Lobby& LobbyPool::create_lobby(Session&, const std::string& gamertag, const GameParameters& params)
+std::shared_ptr<Lobby> lb = std::make_shared<Lobby>(0, GameParameters{});
+Lobby& LobbyPool::create_lobby(Session& s, const std::string& gamertag, const GameParameters& params)
 {
 	cur_mock->gtag = gamertag;
 	cur_mock->gp = params;
@@ -45,20 +46,19 @@ Lobby& LobbyPool::create_lobby(Session&, const std::string& gamertag, const Game
 	if (gamertag == "FAUX")
 		throw LogicException{ 0x2, "DUMMY ERROR" };
 
-	static Lobby lb{ 0, params };
-	return lb;
+	lb->join(s, gamertag);
+	return *lb;
 }
 constexpr lobby_id_t BAD_LID = 0xffffffff;
-Lobby& LobbyPool::join_lobby(lobby_id_t lid, Session&, const std::string&)
+Lobby& LobbyPool::join_lobby(lobby_id_t lid, Session& s, const std::string& gtag)
 {
 	if (lid == BAD_LID)
-		throw LogicException{ 0x3, "DUMMY EXCEPTION" };
+		throw LogicException{0x3, "DUMMY EXCEPTION" };
 
-	static GameParameters gp;
-	static Lobby l{ 0, gp };
-	return l;
+	lb->join(s, gtag);
+	return *lb;
 }
-Lobby::Lobby(lobby_id_t id, const GameParameters&) : m_id{ id }
+Lobby::Lobby(lobby_id_t id, const GameParameters&) : m_id{id}
 {
 }
 GameParameters const& Lobby::parameters() const
@@ -70,6 +70,32 @@ GameParameters const& Lobby::parameters() const
 
 	return gp;
 }
+void Lobby::join(Session &session, const std::string &gamertag) {
+	m_list_session.push_back(session);
+	m_gamertag_list.push_back(gamertag);
+}
+Session& Lobby::ban(const Session & se, const std::string &gamertag) {
+	if (gamertag == "FAUX")
+		throw LogicException{ 0x2, "DUMMY ERROR" };
+	return const_cast<Session&>(se);
+}
+std::pair<Lobby::const_player_it, Lobby::const_player_it> Lobby::all_players() const {
+	assert(m_gamertag_list.size() > 0);
+	return { m_gamertag_list.cbegin(), m_gamertag_list.cend() };
+}
+Game& Lobby::start_game(const Session &) {
+	static auto t = 0;
+	++t;
+	if (t == 1)
+		throw LogicException{0x21, "DUMMY ERROR"};
+
+	static Game g{GameParameters{}, *this};
+	return g;
+}
+
+Game::Game(GameParameters const&, Lobby& l) : m_lobby{l}
+{}
+
 
 lobby_id_t Lobby::id() const
 {
@@ -170,23 +196,15 @@ struct Fixture {
 	}
 };
 
-BOOST_FIXTURE_TEST_SUITE(lpd, Fixture)
+BOOST_FIXTURE_TEST_SUITE(lobby, Fixture)
 
-BOOST_AUTO_TEST_CASE(todo)
+BOOST_AUTO_TEST_CASE(expulsion_0x15, *boost::unit_test::timeout(1))
 {
-}
-
-/*BOOST_AUTO_TEST_CASE(creation_0x10, *boost::unit_test::timeout(1))
-{
-	uint8_t code = 0x10;
+	uint8_t code = 0x15;
 	std::string jwt{ "JWT_DUMMY" };
-	GameParameters gp;
-	gp.nb_players = 2;
-	gp.id_map = 13;
-	gp.sec_by_turn = 42;
 
 	std::vector<char> msg;
-	create_buf(msg, code, gp, jwt);
+	create_buf(msg, code, jwt);
 	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
 
 	wss_s->write(cbuf);
@@ -195,107 +213,17 @@ BOOST_AUTO_TEST_CASE(todo)
 	size_t read = wss_s->read(buf);
 
 	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
-	BOOST_TEST(code == 0x11);
+	BOOST_TEST(code == 0x16);
 
-	lobby_id_t lb_id;
-	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code, lb_id);
-	BOOST_TEST(lb_id == 0);
+	std::string motif;
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code, motif);
+	BOOST_TEST(motif != "");
 }
 
-BOOST_AUTO_TEST_CASE(creation_0x10_toosmall, *boost::unit_test::timeout(1))
+BOOST_AUTO_TEST_CASE(expulsion_0x15_toosmall, *boost::unit_test::timeout(1))
 {
-	uint8_t code = 0x10;
+	uint8_t code = 0x15;
 	std::string jwt{ "JWT_DUMMY" };
-	GameParameters gp;
-	gp.nb_players = 2;
-	gp.id_map = 13;
-	gp.sec_by_turn = 42;
-
-	std::vector<char> msg;
-	create_buf(msg, code, gp.nb_players);
-	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
-
-	wss_s->write(cbuf);
-
-	boost::beast::flat_buffer buf;
-	size_t read = wss_s->read(buf);
-
-	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
-	BOOST_TEST(code == 0x0);
-}
-
-BOOST_AUTO_TEST_CASE(creation_0x10_badjwt, *boost::unit_test::timeout(1))
-{
-	uint8_t code = 0x10;
-	std::string jwt{ "" };
-	GameParameters gp;
-	gp.nb_players = 2;
-	gp.id_map = 13;
-	gp.sec_by_turn = 42;
-
-	std::vector<char> msg;
-	create_buf(msg, code, gp, jwt);
-	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
-
-	wss_s->write(cbuf);
-
-	boost::beast::flat_buffer buf;
-	size_t read = wss_s->read(buf);
-
-	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
-	BOOST_TEST(code == 0x0);
-}
-
-BOOST_AUTO_TEST_CASE(creation_0x10_logicexception, *boost::unit_test::timeout(1))
-{
-	uint8_t code = 0x10;
-	std::string jwt{ "FAUX" };
-	GameParameters gp;
-	gp.nb_players = 2;
-	gp.id_map = 13;
-	gp.sec_by_turn = 42;
-
-	std::vector<char> msg;
-	create_buf(msg, code, gp, jwt);
-	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
-
-	wss_s->write(cbuf);
-
-	boost::beast::flat_buffer buf;
-	size_t read = wss_s->read(buf);
-
-	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
-	BOOST_TEST(code == 0x0);
-}
-
-BOOST_AUTO_TEST_CASE(join_0x12, *boost::unit_test::timeout(1))
-{
-	uint8_t code = 0x12;
-	std::string jwt{ "JWT_DUMMY" };
-	uint64_t lid = 0x123456789abcdef;
-
-	std::vector<char> msg;
-	create_buf(msg, code, lid, jwt);
-	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
-
-	wss_s->write(cbuf);
-
-	boost::beast::flat_buffer buf;
-	size_t read = wss_s->read(buf);
-
-	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
-	BOOST_TEST(code == 0x13);
-
-	GameParameters gp;
-	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code, gp.nb_players, gp.id_map, gp.sec_by_turn);
-	BOOST_TEST(gp.nb_players == 2);
-	BOOST_TEST(gp.id_map == 3);
-	BOOST_TEST(gp.sec_by_turn == 4);
-}
-
-BOOST_AUTO_TEST_CASE(join_0x12_toosmall, *boost::unit_test::timeout(1))
-{
-	uint8_t code = 0x12;
 
 	std::vector<char> msg;
 	create_buf(msg, code);
@@ -310,14 +238,13 @@ BOOST_AUTO_TEST_CASE(join_0x12_toosmall, *boost::unit_test::timeout(1))
 	BOOST_TEST(code == 0x0);
 }
 
-BOOST_AUTO_TEST_CASE(join_0x12_badjwt, *boost::unit_test::timeout(1))
+BOOST_AUTO_TEST_CASE(expulsion_0x15_badjwt, *boost::unit_test::timeout(1))
 {
-	uint8_t code = 0x12;
+	uint8_t code = 0x15;
 	std::string jwt{ "" };
-	uint64_t lid = 0x123456789abcdef;
 
 	std::vector<char> msg;
-	create_buf(msg, code, lid, jwt);
+	create_buf(msg, code, jwt);
 	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
 
 	wss_s->write(cbuf);
@@ -329,14 +256,67 @@ BOOST_AUTO_TEST_CASE(join_0x12_badjwt, *boost::unit_test::timeout(1))
 	BOOST_TEST(code == 0x0);
 }
 
-BOOST_AUTO_TEST_CASE(join_0x12_logicexception, *boost::unit_test::timeout(1))
+BOOST_AUTO_TEST_CASE(expulsion_0x15_logicexception, *boost::unit_test::timeout(1))
 {
-	uint8_t code = 0x12;
-	std::string jwt{ "JWT_DUMMY" };
-	uint64_t lid = BAD_LID;
+	uint8_t code = 0x15;
+	std::string jwt{ "FAUX" };
 
 	std::vector<char> msg;
-	create_buf(msg, code, lid, jwt);
+	create_buf(msg, code, jwt);
+	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
+
+	wss_s->write(cbuf);
+
+	boost::beast::flat_buffer buf;
+	size_t read = wss_s->read(buf);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+	BOOST_TEST(code == 0x0);
+}
+
+BOOST_AUTO_TEST_CASE(start_0x20_logicexception, *boost::unit_test::timeout(1))
+{
+	uint8_t code = 0x20;
+
+	std::vector<char> msg;
+	create_buf(msg, code);
+	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
+
+	wss_s->write(cbuf);
+
+	boost::beast::flat_buffer buf;
+	size_t read = wss_s->read(buf);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+	BOOST_TEST(code == 0x0);
+
+	//reset
+	lb = std::make_shared<Lobby>(0, GameParameters{});
+}
+
+BOOST_AUTO_TEST_CASE(start_0x20, *boost::unit_test::timeout(1))
+{
+	uint8_t code = 0x20;
+
+	std::vector<char> msg;
+	create_buf(msg, code);
+	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
+
+	wss_s->write(cbuf);
+
+	boost::beast::flat_buffer buf;
+	size_t read = wss_s->read(buf);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+	BOOST_TEST(code == 0x21);
+}
+
+BOOST_AUTO_TEST_CASE(start_0x20_toobig, *boost::unit_test::timeout(1))
+{
+	uint8_t code = 0x20;
+
+	std::vector<char> msg;
+	create_buf(msg, code, std::string{"padding"});
 	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
 
 	wss_s->write(cbuf);
@@ -364,5 +344,5 @@ BOOST_AUTO_TEST_CASE(bad_msg_id, *boost::unit_test::timeout(1))
 	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
 	BOOST_TEST(code == 0x0);
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()

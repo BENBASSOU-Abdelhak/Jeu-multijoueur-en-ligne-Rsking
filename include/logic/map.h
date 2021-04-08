@@ -14,7 +14,8 @@ class Map
 {
     public:
 	Map();
-	template <typename Stream> friend void create_buf(Stream& sbuf, Map const& map);
+	template <typename Stream>
+	friend void create_buf(Stream& sbuf, Map const& map);
 
     private:
 	std::vector<uint16_t> m_area_values;
