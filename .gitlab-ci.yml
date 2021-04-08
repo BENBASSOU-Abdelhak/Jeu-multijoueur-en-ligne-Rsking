@@ -2,6 +2,8 @@ image: $CI_REGISTRY/risking/build-image:master
 
 build:
   stage: build
+  before_script:
+    - apt update && apt -y install libssl-dev
   script:
     - mkdir build && cd build
     - cmake -DCMAKE_BUILD_TYPE=Debug ..
