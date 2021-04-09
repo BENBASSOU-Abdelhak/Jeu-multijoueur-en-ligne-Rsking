@@ -11,7 +11,7 @@ build:
   artifacts:
     paths:
       - build/
-    expire_in: 7 days
+    expire_in: 2 hours
 
 # run tests using the binary built
 test:
@@ -117,4 +117,7 @@ build_container:
       - stuck_or_timeout_failure
   tags:
     - docker-privilegied
+  only:
+    refs:
+      - develop
 
