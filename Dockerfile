@@ -33,4 +33,6 @@ COPY --from=compile-part /usr/local/lib/mariadb /usr/local/lib/mariadb
 WORKDIR /root/risking-serveur
 
 EXPOSE 42424/tcp
-CMD ./risking
+
+ENTRYPOINT ["./risking"]
+CMD ["0.0.0.0", "42424", "4"]

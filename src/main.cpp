@@ -14,7 +14,7 @@
 int main(int argc, char* argv[])
 {
 	if (argc < 3) {
-		std::cerr << "usage: risking <IPv4> <port> <nbthreads>";
+		std::cerr << "usage: risking <IPv4> <port> <nbthreads>" << std::endl;
 		return EXIT_FAILURE;
 	}
 	auto const address = boost::asio::ip::make_address_v4(argv[1]);
