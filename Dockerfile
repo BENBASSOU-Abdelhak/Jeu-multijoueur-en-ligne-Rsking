@@ -21,6 +21,8 @@ FROM alpine:latest as runtime-part
 
 # Alpine seems to use musl-libc (issue similar to https://github.com/kohlschutter/junixsocket/issues/33)
 RUN apk add --no-cache libstdc++
+# Required for boost
+RUN apk add --no-cache boost-dev
 # Required for database connection
 RUN apk add --no-cache unixodbc
 
