@@ -3,7 +3,7 @@ FROM alpine:latest as compile-part
 
 RUN apk add --no-cache g++ make cmake boost-dev openssl-dev unixodbc-dev wget tar git
 
-# Install mariadb-connector-odbc manually (package mariadb-connector-odbc package seems missing)
+# Install mariadb-connector-odbc manually (package mariadb-connector-odbc seems missing on Alpine)
 WORKDIR /root/mariadb-connector-odbc
 RUN git clone https://github.com/MariaDB/mariadb-connector-odbc.git .
 RUN cmake -DCMAKE_BUILD_TYPE=Release -DCONC_WITH_UNIT_TESTS=Off -DCMAKE_INSTALL_PREFIX=/usr/local -DWITH_SSL=OPENSSL .
@@ -26,8 +26,11 @@ RUN apk add --no-cache boost-dev
 # Required for database connection
 RUN apk add --no-cache unixodbc
 
-COPY --from=compile-part /root/risking-serveur/risking /usr/bin/risking
+COPY --from=compile-part /root/risking-serveur/risking /root/risking-serveur/risking
 COPY --from=compile-part /usr/local/lib/mariadb /usr/local/lib/mariadb
 
+# Required to find the certificate
+WORKDIR /root/risking-serveur
+
 EXPOSE 42424/tcp
-CMD /usr/bin/risking
+CMD ./risking
