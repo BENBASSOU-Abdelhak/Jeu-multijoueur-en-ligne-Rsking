@@ -6,13 +6,22 @@
  */
 #include "network/listener.h"
 
+#include <iostream>
 #include <thread>
+
+#include <boost/asio/ip/address_v4.hpp>
 
 int main(int argc, char* argv[])
 {
-	auto const address = boost::asio::ip::address_v4::loopback();
-	auto const port = 42424;
-	auto const threads = 1;
+	if (argc < 3) {
+		std::cerr << "usage: risking <IPv4> <port> <nbthreads>";
+		return EXIT_FAILURE;
+	}
+	auto const address = boost::asio::ip::make_address_v4(argv[1]);
+	auto const port = static_cast<unsigned short>(std::stoi(argv[2]));
+	auto const threads = argc > 3 ? std::stoi(argv[3]) : 1;
+
+	std::cout << "Starting WSS server on : " << address << ":" << port << " using " << threads << " threads." << std::endl;
 
 	// The io_context is required for all I/O
 	boost::asio::io_context ioc{ threads };
