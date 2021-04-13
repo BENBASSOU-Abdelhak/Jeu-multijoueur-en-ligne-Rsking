@@ -25,6 +25,7 @@ size_t unserialize(raw_type, size_t)
 size_t deflate(raw_type const& buf, size_t left, bool& b)
 {
 	assert(left > 0 && "trying to deflate empty buffer into bool");
+	((void)left);
 	b = buf[0];
 	return 1;
 }
