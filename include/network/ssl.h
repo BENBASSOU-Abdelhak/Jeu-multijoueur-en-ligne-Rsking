@@ -14,6 +14,11 @@ class SslContext
     public:
 	static boost::asio::ssl::context& get();
 
+	/*
+	 * @brief Change le dossier où sont stocké les certificats
+	 */
+	static void conf_dir(std::string const& dir);
+
     private:
 	/**
 		 * @brief Crée un contexte depuis un certain type avec un certificat sous forme de fichier
@@ -26,6 +31,8 @@ class SslContext
 		   std::string const& path_to_key);
 
 	boost::asio::ssl::context ctx_;
+	static SslContext inst_;
+	static std::string dir_;
 };
 
 #endif

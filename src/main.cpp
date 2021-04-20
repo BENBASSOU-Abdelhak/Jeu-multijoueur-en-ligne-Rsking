@@ -5,6 +5,7 @@
  * - max lobbies
  */
 #include "network/listener.h"
+#include "network/ssl.h"
 
 #include <iostream>
 #include <thread>
@@ -14,12 +15,14 @@
 int main(int argc, char* argv[])
 {
 	if (argc < 3) {
-		std::cerr << "usage: risking <IPv4> <port> <nbthreads>" << std::endl;
+		std::cerr << "usage: risking <IPv4> <port> [<nbthreads> <config dir>]" << std::endl;
 		return EXIT_FAILURE;
 	}
 	auto const address = boost::asio::ip::make_address_v4(argv[1]);
 	auto const port = static_cast<unsigned short>(std::stoi(argv[2]));
 	auto const threads = argc > 3 ? std::stoi(argv[3]) : 1;
+	if (argc > 4)
+		SslContext::conf_dir(argv[4]);
 
 	std::cout << "Starting WSS server on : " << address << ":" << port << " using " << threads << " threads." << std::endl;
 
