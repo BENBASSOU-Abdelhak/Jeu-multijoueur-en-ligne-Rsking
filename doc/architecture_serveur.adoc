@@ -420,7 +420,7 @@ NOTE: Il faudra peut-être faire des accesseurs, ou utiliser l'amitié.
 Le module *JWT* sera similaire au module BDD dans le sens où il sera aussi basé sur un http://www.vishalchovatiya.com/singleton-design-pattern-in-modern-cpp/[Singleton] du nom de *JWT*.
 
 Il fournira les services suivants : +
-* *_Vérifier_* qu'un JWT. +
+* *_Vérifier_* qu'un JWT est valide. +
 * *_Désérializer_* un JWT si il est valide. +
 
 #### Interface
