@@ -26,6 +26,11 @@ RUN apk add --no-cache boost-dev
 # Required for database connection
 RUN apk add --no-cache unixodbc
 
+# Set time
+RUN apk add --no-cache tzdata
+ENV TZ=Europe/Paris
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 COPY --from=compile-part /root/risking-serveur/risking /root/risking-serveur/risking
 COPY --from=compile-part /usr/local/lib/mariadb /usr/local/lib/mariadb
 
