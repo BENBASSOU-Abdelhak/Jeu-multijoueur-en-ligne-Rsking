@@ -11,6 +11,6 @@
 #define PROG_FULLNAME PROG_NAME " v0.1"
 
 // options
-#define DUMP_SSL_SECRETS OFF
+#define DUMP_SSL_SECRETS ON
 
 #endif
