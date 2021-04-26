@@ -180,6 +180,7 @@ BOOST_AUTO_TEST_CASE(wss_exchange, *boost::unit_test::timeout(1))
 	}
 }
 
+#ifdef WSS_EMPTY_MESSAGE_IS_ERROR
 BOOST_AUTO_TEST_CASE(wss_empty_message, *boost::unit_test::timeout(1))
 {
 	std::shared_ptr<io_context> ioc;
@@ -246,3 +247,4 @@ BOOST_AUTO_TEST_CASE(session_cmp, *boost::unit_test::timeout(1)) {
 
 	BOOST_CHECK(*s1 != *s2);
 }
+#endif
