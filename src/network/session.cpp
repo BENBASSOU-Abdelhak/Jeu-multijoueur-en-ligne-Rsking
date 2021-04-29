@@ -122,7 +122,7 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 		return;
 	}
 
-	if (ec)
+	if (ec && ec.value() != boost::system::errc::operation_canceled)
 		fail(ec, "read");
 
 	if (bytes_transferred == 0) { // no message
