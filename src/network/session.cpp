@@ -54,7 +54,9 @@ void Session::run()
 
 void Session::on_run()
 {
-	beast::get_lowest_layer(wss_).expires_after(std::chrono::seconds(30));
+	/* Timings */
+	//beast::get_lowest_layer(wss_).expires_after();
+	wss_.set_option(websocket::stream_base::timeout::suggested(beast::role_type::server));
 
 	// Perform the SSL handshake
 	wss_.next_layer().async_handshake(net::ssl::stream_base::server,
@@ -131,7 +133,6 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 		send_error(*this, 0, "message vide");
 #endif
 	} else {
-
 		BOOST_LOG_TRIVIAL(debug) << "Received: " << bytes_transferred << " bytes";
 		unserialize(bytes_transferred);
 	}
