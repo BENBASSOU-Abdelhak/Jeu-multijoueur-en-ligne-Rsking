@@ -64,7 +64,7 @@ void Session::on_run()
 void Session::on_accept(beast::error_code ec)
 {
 	if (ec)
-		return fail(ec, "accept");
+		return fail(ec, "session accept");
 
 	// Read a message
 	do_read();
@@ -123,7 +123,7 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 	}
 
 	if (ec && ec.value() != boost::system::errc::operation_canceled)
-		fail(ec, "read");
+		fail(ec, "session read");
 
 	if (bytes_transferred == 0) { // no message
 #ifdef EMPTY_MESSAGE_IS_ERROR
@@ -141,7 +141,7 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 void Session::on_write(beast::error_code ec, std::size_t bytes_transferred)
 {
 	if (ec)
-		return fail(ec, "write");
+		return fail(ec, "session write");
 
 	// Remove the string from the queue
 	queue_.erase(queue_.begin());
