@@ -124,14 +124,14 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 		return;
 	}
 
-	if (ec && ec.value() != boost::system::errc::operation_canceled)
+	if (ec) {
 		fail(ec, "session read");
+		return;
+	}
 
 	if (bytes_transferred == 0) { // no message
-#ifdef EMPTY_MESSAGE_IS_ERROR
 		BOOST_LOG_TRIVIAL(warning) << "Received an empty message";
 		send_error(*this, 0, "message vide");
-#endif
 	} else {
 		BOOST_LOG_TRIVIAL(debug) << "Received: " << bytes_transferred << " bytes";
 		unserialize(bytes_transferred);
