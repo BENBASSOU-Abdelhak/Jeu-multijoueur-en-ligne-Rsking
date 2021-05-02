@@ -1,0 +1,23 @@
+une valeur de region en moins
+9
+4
+2
+2
+1
+0 2
+1 3
+4 6 5
+7 8
+nom region 0
+nom region 1
+nom region 2
+nom region 3
+0 1 1 1 0 0 0 0 0
+1 0 0 1 0 0 0 0 0
+1 0 0 1 1 0 1 0 0
+1 1 1 0 0 1 1 0 0
+0 0 1 0 0 0 1 1 0
+0 0 0 1 0 0 1 0 0
+0 0 1 1 1 1 0 1 0
+0 0 0 0 1 0 1 0 1
+0 0 0 0 0 0 0 1 0

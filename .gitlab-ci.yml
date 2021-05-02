@@ -60,9 +60,9 @@ doc_pdf:
   needs:
     - test
   before_script:
-    - gem install asciidoctor asciidoctor-pdf asciidoctor-diagram --pre
+    - gem install asciidoctor asciidoctor-pdf --pre
   script:
-    - asciidoctor-pdf -r asciidoctor-diagram doc/*.adoc
+    - asciidoctor-pdf doc/*.adoc
   artifacts:
     paths:
       - "doc/*.pdf"
@@ -74,7 +74,7 @@ pages:
   needs:
     - test
   before_script:
-    - gem install asciidoctor asciidoctor-pdf asciidoctor-diagram --pre
+    - gem install asciidoctor asciidoctor-pdf --pre
   script:
     - asciidoctor doc/*.adoc
     - mkdir -p public
