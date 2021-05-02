@@ -34,6 +34,8 @@ BOOST_AUTO_TEST_CASE(test_certificates)
 {
 	try {
 		SslContext::get();
+		BOOST_TEST(SslContext::get().path_to_certificate() != "");
+		BOOST_TEST(SslContext::get().path_to_key() != "");
 	} catch (std::runtime_error const& e) {
 		BOOST_TEST(false);
 	}

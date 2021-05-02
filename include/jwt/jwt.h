@@ -6,8 +6,15 @@
 #include <chrono>
 #include <string>
 
-using uuid_t = uint64_t;
+//#ifdef JWT
+#include <jwt-cpp/jwt.h>
+//#endif
+
+using uuid_t = std::string; // uint128_t
 using timepoint = std::chrono::time_point<std::chrono::system_clock>;
+inline uuid_t to_uuid(std::string const& str) {
+	return str;//std::stoll(str);
+}
 
 struct JWT_t {
 	std::string iss;
@@ -16,7 +23,7 @@ struct JWT_t {
 	timepoint iat;
 	timepoint exp;
 	timepoint nbf;
-	uint64_t jti;
+	std::string jti;
 };
 
 class JWT
@@ -29,7 +36,11 @@ class JWT
 	JWT_t decode(std::string const& jwt);
 
     private:
-	JWT();
+	JWT(std::string const& path_to_key, std::string const& path_to_certificate);
+
+//#ifdef JWT
+	decltype(jwt::verify()) verifier;
+//#endif
 };
 
 #endif

@@ -3,19 +3,31 @@
 
 namespace ssl = boost::asio::ssl;
 
-void SslContext::conf_dir(std::string const& dir) {
+void SslContext::conf_dir(std::string const& dir)
+{
 	SslContext::dir_ = dir;
 }
 
-boost::asio::ssl::context& SslContext::get()
+std::string const& SslContext::path_to_key() const
 {
-	static SslContext inst{ ssl::context::tls_server, SslContext::dir_ + "certificate.cert", SslContext::dir_ + "pri.key" };
-	return inst.ctx_;
+	return path_to_key_;
+}
+
+std::string const& SslContext::path_to_certificate() const
+{
+	return path_to_certificate_;
+}
+
+SslContext& SslContext::get()
+{
+	static SslContext inst{ ssl::context::tls_server, SslContext::dir_ + "certificate.cert",
+				SslContext::dir_ + "pri.key" };
+	return inst;
 }
 
 SslContext::SslContext(ssl::context::method method, std::string const& path_to_certificate,
 		       std::string const& path_to_key)
-	: ctx_{ method }
+	: ctx_{ method }, path_to_key_{ path_to_key }, path_to_certificate_{ path_to_certificate }
 {
 	boost::system::error_code ec;
 
@@ -32,4 +44,9 @@ SslContext::SslContext(ssl::context::method method, std::string const& path_to_c
 	}
 }
 
-std::string SslContext::dir_{"./"};
+std::string SslContext::dir_{ "./" };
+
+SslContext::operator boost::asio::ssl::context&()
+{
+	return ctx_;
+}

@@ -71,26 +71,6 @@ __attribute__((weak)) Map const& Game::get_map() const
 	return m_map;
 }
 
-JWT::JWT()
-{
-}
-
-JWT& JWT::get()
-{
-	static JWT inst{};
-	return inst;
-}
-
-__attribute__((weak)) bool JWT::verify(std::string const&)
-{
-	return true;
-}
-
-__attribute__((weak)) JWT_t JWT::decode(std::string const&)
-{
-	return JWT_t{};
-}
-
 __attribute__((weak)) Map::Map()
 {
 }
