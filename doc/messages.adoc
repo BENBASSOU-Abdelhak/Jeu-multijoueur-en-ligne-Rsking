@@ -263,6 +263,14 @@ Code:Gagnant
 _uint8_t_:string
 :===
 
+.Erreurs
+****
+:===
+*Sous-code*:Signification
+0x22:La partie est finie
+:===
+****
+
 <<<
 
 #### Joueur éliminé
@@ -295,6 +303,14 @@ Code:Joueur:Troupes
 *0x30*:Pseudo du joueur:Nombre de troupes à placer
 _uint8_t_:string:_uint16_t_
 :===
+
+.Erreurs
+****
+:===
+*Sous-code*:Signification
+0x30:Mauvaise phase de jeu
+:===
+****
 
 <<<
 
