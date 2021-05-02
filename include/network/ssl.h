@@ -12,12 +12,17 @@
 class SslContext
 {
     public:
-	static boost::asio::ssl::context& get();
+	static SslContext& get();
 
 	/*
 	 * @brief Change le dossier où sont stocké les certificats
 	 */
 	static void conf_dir(std::string const& dir);
+
+	std::string const& path_to_key() const;
+	std::string const& path_to_certificate() const;
+
+	operator boost::asio::ssl::context & ();
 
     private:
 	/**
@@ -33,6 +38,9 @@ class SslContext
 	boost::asio::ssl::context ctx_;
 	static SslContext inst_;
 	static std::string dir_;
+
+	std::string path_to_key_;
+	std::string path_to_certificate_;
 };
 
 #endif

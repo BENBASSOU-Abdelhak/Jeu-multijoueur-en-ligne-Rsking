@@ -57,7 +57,12 @@ target_link_libraries(risking_lib PUBLIC Boost::system Boost::thread Boost::rege
 # OpenSSL
 find_package(OpenSSL REQUIRED)
 target_include_directories(risking_lib PUBLIC ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(risking_lib PRIVATE OpenSSL::SSL)
+target_link_libraries(risking_lib PUBLIC OpenSSL::SSL)
+
+# jwt-cpp
+set(jwt-cpp_DIR "/usr/local/cmake/jwt-cpp")
+find_package(jwt-cpp CONFIG REQUIRED)
+target_link_libraries(risking_lib PUBLIC jwt-cpp::jwt-cpp)
 
 # Tests
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND BUILD_TEST)
