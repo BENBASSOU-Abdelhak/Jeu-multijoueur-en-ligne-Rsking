@@ -39,17 +39,19 @@ class Mock_dispatcher : public Dispatcher
 		uint16_t c = code;
 		BOOST_LOG_TRIVIAL(debug)
 			<< "received message of " << bytes_transferred << "bytes with code 0x" << std::hex << c;
-		buf_ = &buf;
+		buf_.resize(buf.size());
+		for (size_t i = 0; i < buf.size(); ++i)
+			buf_[i] = static_cast<const char*>(buf.data())[i];
 		code_ = code;
 		bytes_transferred_ = bytes_transferred;
 		boost::ignore_unused(session);
 		return bytes_transferred;
 	}
-	static boost::asio::const_buffer const* buf_;
+	static std::vector<char> buf_;
 	static uint8_t code_;
 	static size_t bytes_transferred_;
 };
-boost::asio::const_buffer const* Mock_dispatcher::buf_ = nullptr;
+std::vector<char> Mock_dispatcher::buf_{};
 uint8_t Mock_dispatcher::code_ = 0;
 size_t Mock_dispatcher::bytes_transferred_ = 0;
 
@@ -174,9 +176,8 @@ BOOST_AUTO_TEST_CASE(wss_exchange, *boost::unit_test::timeout(1))
 	BOOST_TEST(Mock_dispatcher::code_ == code);
 	BOOST_TEST(Mock_dispatcher::bytes_transferred_ == vect.size() - 1);
 
-	const unsigned char* raw = static_cast<const unsigned char*>(Mock_dispatcher::buf_->data());
-	for (size_t i = 0; i < vect.size() - 1; ++i) {
-		BOOST_TEST(raw[i] == vect[i + 1]);
+	for (size_t i = 0; i < Mock_dispatcher::buf_.size(); ++i) {
+		BOOST_TEST(Mock_dispatcher::buf_[i] == vect[i + 1]);
 	}
 }
 

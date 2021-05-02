@@ -52,3 +52,7 @@ endif()
 add_custom_target(copy_test_certs
 	COMMAND cp "${TES_DIR}/*.cert" "${TES_DIR}/*.key" ./)
 add_dependencies(network_listener copy_test_certs)
+
+add_custom_target(copy_test_maps
+	COMMAND cp -r "${TES_DIR}/testmaps/" ./)
+add_dependencies(map_test copy_test_maps)

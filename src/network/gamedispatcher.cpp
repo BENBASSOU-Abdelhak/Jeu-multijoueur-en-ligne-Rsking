@@ -50,7 +50,7 @@ size_t GameDispatcher::place_troops(Session& session, boost::asio::const_buffer 
 
 	try {
 		auto cp = game_.current_phase();
-		game_.add_troups(session, dst, nbt);
+		game_.add_troops(session, dst, nbt);
 
 		broadcast(game_.lobby(), static_cast<uint8_t>(0x41), dst, nbt);
 

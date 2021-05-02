@@ -101,7 +101,7 @@ Game& Lobby::start_game(const Session&)
 Game::Game(GameParameters const&, Lobby& l) : m_lobby{ l }
 {
 }
-void Game::add_troups(const Session&, uint16_t dst_square, uint16_t)
+void Game::add_troops(const Session&, uint16_t dst_square, uint16_t)
 {
 	if (dst_square == 0x0)
 		throw LogicException{ 0x40, "DUMMY_ERROR" };
@@ -123,9 +123,20 @@ Gamephase Game::current_phase() const
 	static uint8_t t = 1;
 	return static_cast<Gamephase>(t++ % 3);
 }
+uint16_t Game::troop_gained() {
+	return 0;
+}
+std::string const& Game::current_player() const {
+	static std::string gtag{"GTAG"};
+	return gtag;
+}
 uint16_t Game::time_left() const
 {
 	return 0xabcd;
+}
+std::string const& Game::winner() {
+	static std::string w{"WINNER"};
+	return w;
 }
 Lobby& Game::lobby() const
 {
