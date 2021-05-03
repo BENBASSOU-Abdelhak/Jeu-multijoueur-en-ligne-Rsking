@@ -17,6 +17,7 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/include")
 set(TES_DIR "${PROJECT_SOURCE_DIR}/tests")
+set(MAP_DIR "${PROJECT_SOURCE_DIR}/maps")
 
 add_executable(risking)
 target_sources(risking PUBLIC "${SRC_DIR}/main.cpp")
@@ -78,3 +79,8 @@ enable_testing()
 if((((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR RISKING_BUILD_TESTING) AND BUILD_TESTING)) AND BUILD_TEST)
 	include("${TES_DIR}/boost.cmake")
 endif()
+
+# ajout des maps
+add_custom_target(copy_maps
+	COMMAND cp "${MAP_DIR}/*" ./)
+add_dependencies(risking copy_maps)
