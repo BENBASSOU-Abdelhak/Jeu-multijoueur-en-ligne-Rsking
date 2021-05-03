@@ -91,9 +91,6 @@ pages:
   stage: deploy
   needs:
     - test
-  variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-    CACHE_REPO: $CI_REGISTRY_IMAGE/cache
   interruptible: true
   retry:
     when:
@@ -109,20 +106,26 @@ build_container:x86:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:x86-$CI_COMMIT_REF_SLUG
+    CACHE_REPO: $CI_REGISTRY_IMAGE/cache
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --cache=true --cache-repo=$CACHE_REPO --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --cache=true --cache-repo=$CACHE_REPO --destination $IMAGE_TAG
 
 # ARM/v7 build, not supported by Kaniko (we are using host Docker (not exactly dind), see raspberry-pi config and https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4260)
 build_container:armv7:
   <<: *build_container
   image: docker:19.03-dind
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:armv7-$CI_COMMIT_REF_SLUG
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
     - docker pull $IMAGE_TAG || true
     - docker build --cache-from $IMAGE_TAG -t $IMAGE_TAG --progress=plain .
+    - docker push $IMAGE_TAG
   tags:
     - arm
     - privileged
