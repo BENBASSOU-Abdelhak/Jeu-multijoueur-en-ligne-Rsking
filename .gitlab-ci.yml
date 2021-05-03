@@ -2,13 +2,13 @@ image: $CI_REGISTRY/risking/build-image:master
 
 build:
   stage: build
-  before_script:
-    - apt update && apt -y install libssl-dev
+  before_script: # Trying to fix OpenSSL dev
+    - apk add openssl openssl-dev
   script:
     - mkdir build && cd build
     - cmake -DCMAKE_BUILD_TYPE=Debug ..
     - make
-  artifacts:
+  artifacts: # Save artifacts so "test" job can use it
     paths:
       - build/
     expire_in: 2 hours
@@ -16,10 +16,10 @@ build:
 # run tests using the binary built
 test:
   stage: test
-  needs:
-    - build
-  before_script:
-    - apt update && apt -y install libssl-dev
+  dependencies:
+    - build # Download only build artifacts
+  before_script: # Trying to fix OpenSSL dev
+    - apk add openssl openssl-dev
   script:
     - cd build
     - ctest -T test --verbose --no-compress-output --output-on-failure
@@ -35,10 +35,8 @@ test:
 #run coverage
 coverage:
   stage: deploy
-  needs:
-    - test
-  before_script:
-    - apt update && apt -y install libssl-dev
+  before_script: # Trying to fix OpenSSL dev
+    - apk add openssl openssl-dev
   script:
     - cmake -DCOVERAGE=ON -DCMAKE_BUILD_TYPE=Debug .
     - make all coverage
@@ -57,8 +55,6 @@ coverage:
 # Generate documentation (pdf)
 doc_pdf:
   stage: deploy
-  needs:
-    - test
   before_script:
     - gem install asciidoctor asciidoctor-pdf --pre
   script:
@@ -71,8 +67,6 @@ doc_pdf:
 # Upload to Gitlab pages (html)
 pages:
   stage: deploy
-  needs:
-    - test
   before_script:
     - gem install asciidoctor asciidoctor-pdf --pre
   script:
@@ -89,8 +83,6 @@ pages:
 
 .build_container: &build_container
   stage: deploy
-  needs:
-    - test
   interruptible: true
   retry:
     when:
