@@ -1,7 +1,7 @@
 # Build part
 FROM alpine:latest as compile-part
 
-RUN apk add --no-cache g++ make cmake boost-dev openssl-dev unixodbc-dev wget tar git
+RUN apk -U add --no-cache g++ make cmake boost-dev openssl-dev unixodbc-dev wget tar git
 
 # Install mariadb-connector-odbc manually (package mariadb-connector-odbc seems missing on Alpine)
 WORKDIR /root/mariadb-connector-odbc
@@ -9,6 +9,10 @@ RUN git clone https://github.com/MariaDB/mariadb-connector-odbc.git .
 RUN cmake -DCMAKE_BUILD_TYPE=Release -DCONC_WITH_UNIT_TESTS=Off -DCMAKE_INSTALL_PREFIX=/usr/local -DWITH_SSL=OPENSSL .
 RUN cmake --build . --config Release
 RUN make -j install
+
+RUN git clone https://github.com/Thalhammer/jwt-cpp.git
+RUN cd jwt-cpp && cmake . && make install 
+RUN mkdir -p /usr/lib/cmake && ln -sf /usr/local/cmake/jwt-cpp /usr/lib/cmake/jwt-cpp
 
 COPY . /root/risking-serveur
 WORKDIR /root/risking-serveur
