@@ -1,5 +1,11 @@
 image: $CI_REGISTRY/risking/build-image:master
 
+stages:
+  - build
+  - test
+  - deploy
+  - post-deploy
+
 build:
   stage: build
   before_script: # Trying to fix OpenSSL dev
@@ -121,3 +127,24 @@ build_container:armv7:
   tags:
     - arm
     - privileged
+
+build_container:assemble_manifests:
+  stage: post-deploy
+  needs:
+    - build_container:x86
+    - build_container:armv7
+  image: docker:19.03
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - export DOCKER_CLI_EXPERIMENTAL=enabled # Docker manifest is an experimental feature
+    - docker manifest create $IMAGE_TAG $CI_REGISTRY_IMAGE:armv7-$CI_COMMIT_REF_SLUG $CI_REGISTRY_IMAGE:x86-$CI_COMMIT_REF_SLUG
+    - docker manifest push $IMAGE_TAG
+  tags:
+    - arm
+    - privileged
+  only:
+    refs:
+      - develop
