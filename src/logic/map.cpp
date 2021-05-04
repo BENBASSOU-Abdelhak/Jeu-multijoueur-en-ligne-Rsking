@@ -18,16 +18,16 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
 
     std::getline(fd_map, tmp_line); // j'ignore le nom de la map  
     if (!(fd_map >> nb_square) || nb_square <= 0)
-        throw std::string("bad format file");
+        throw std::logic_error("bad format file");
     if (!(fd_map >> nb_area) || nb_area <= 0)
-        throw std::string("bad format file");
+        throw std::logic_error("bad format file");
     
     //recup le valeur des regions
     m_area_values.resize(nb_area);
     for (uint16_t i = 0; i < nb_area; i++)
     {
         if (!(fd_map >> tmp_int))
-            throw std::string("bad format file");
+            throw std::logic_error("bad format file");
         m_area_values[i] = tmp_int;
     }
     
@@ -41,16 +41,16 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
         std::stringstream ss_line(tmp_line);
         while (ss_line >> tmp_int) {
             if (tmp_int >= nb_square )
-                throw std::string("bad format file");
+                throw std::logic_error("bad format file");
             if (check_square[tmp_int])
-                throw std::string("bad format file");
+                throw std::logic_error("bad format file");
             check_square[tmp_int] = true;
             m_info_square[tmp_int].id_region = i;
         }
     }
     for (auto i : check_square)
         if (!i)
-            throw std::string("bad format file");
+            throw std::logic_error("bad format file");
     
     //on ignore les noms des regions
     while(cpt < nb_area) {
@@ -67,12 +67,12 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
             if (fd_map >> tmp_bool)
                 m_matrix[i][j] = tmp_bool;
             else 
-                throw std::string("bad format file");
+                throw std::logic_error("bad format file");
         }
 
     // test fin de fichier
     if (fd_map >> tmp_char)
-        throw std::string("bad format file");
+        throw std::logic_error("bad format file");
 
 
 

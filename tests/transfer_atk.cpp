@@ -274,19 +274,19 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap) {
 		t_game.transfer(*s1, 0, 4, 3);
 		BOOST_TEST(false);
 	}
-	catch (std::string const& e) { BOOST_TEST(true);}
+	catch (std::exception const& e) { BOOST_TEST(true);}
 
     try {
 		t_game.transfer(*s1, 1, 3, 3);
 		BOOST_TEST(false);
 	}
-	catch (std::string const& e) { BOOST_TEST(true);}
+	catch (std::exception const& e) { BOOST_TEST(true);}
 
     try {
 		t_game.transfer(*s1, 0, 3, 4);
 		BOOST_TEST(false);
 	}
-	catch (std::string const& e) { BOOST_TEST(true);}
+	catch (std::exception const& e) { BOOST_TEST(true);}
 
     t_game.transfer(*s1, 0, 3, 2);
     BOOST_TEST(t_game.get_current_player().is_already_transfered_after_atk() == true);
@@ -425,21 +425,21 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap) {
 		t_game.transfer(*s2, 3, 5, 1);
 		BOOST_TEST(false);
 	}
-	catch (std::string const& e) { BOOST_TEST(true);}
+	catch (std::exception const& e) { BOOST_TEST(true);}
 
     // transfert de de la totalite des troupes
     try {
 		t_game.transfer(*s2, 3, 6, 2);
 		BOOST_TEST(false);
 	}
-	catch (std::string const& e) { BOOST_TEST(true);}
+	catch (std::exception const& e) { BOOST_TEST(true);}
 
     // transfert de troupe nul
     try {
 		t_game.transfer(*s2, 3, 6, 0);
 		BOOST_TEST(false);
 	}
-	catch (std::string const& e) { BOOST_TEST(true);}
+	catch (std::exception const& e) { BOOST_TEST(true);}
 
     t_game.get_player_by_tag("p1").set_disconnect();
     t_game.get_player_by_tag("p3").set_disconnect();
@@ -449,7 +449,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap) {
 		t_game.transfer(*s2, 3, 6, 1);
 		BOOST_TEST(false);
 	}
-	catch (std::string const& e) { BOOST_TEST(true);}
+	catch (std::exception const& e) { BOOST_TEST(true);}
 
     t_game.get_player_by_tag("p1").set_connected();
     t_game.transfer(*s2, 3, 6, 1);
