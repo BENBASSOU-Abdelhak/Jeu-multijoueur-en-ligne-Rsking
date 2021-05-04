@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(check_format_file)
         try {
             Map map(i, players);
             BOOST_TEST(false);
-        } catch (std::string const& e) { BOOST_TEST(true);}
+        } catch (std::exception const& e) { BOOST_TEST(true);}
         std::rename(file, oldf);
     }
 
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(check_format_file)
     try {
         Map map(116, players);
         BOOST_TEST(false);
-    } catch (std::string const& e) { BOOST_TEST(true);}
+    } catch (std::exception const& e) { BOOST_TEST(true);}
     std::rename(file, oldf);
 }
 
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(big_map_file)
     try {
         Map map(115, players);
         BOOST_TEST(true);
-    } catch (std::string const& e) { BOOST_TEST(false);}
+    } catch (std::exception const& e) { BOOST_TEST(false);}
     std::rename("115", oldf);   
 }
 
