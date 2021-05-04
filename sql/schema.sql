@@ -17,7 +17,7 @@ USE `risking` ;
 CREATE TABLE IF NOT EXISTS `risking`.`user` (
   `id` VARBINARY(16) NOT NULL,
   `gamertag` VARCHAR(45) NOT NULL,
-  `password` BINARY(64) NOT NULL,
+  `password` BINARY(128) NOT NULL,
   `email` VARCHAR(128) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC),
