@@ -75,12 +75,11 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
         throw std::logic_error("bad format file");
 
 
-
-    //TODO remplissage des proprietaires des territoires 
     for (int i = 0; i < nb_square; i++)
     {
-        m_info_square[i].nb_troops = 2; 
-        m_info_square[i].player_tag = players_tag[i % players_tag.size()]; 
+        m_info_square[i].nb_troops = 2;
+        m_info_square[i].player_tag = players_tag[i % players_tag.size()];
+	m_info_square[i].player_id = 1+ (i % players_tag.size());
     }
 }
 
