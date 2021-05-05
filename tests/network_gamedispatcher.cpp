@@ -123,19 +123,22 @@ Gamephase Game::current_phase() const
 	static uint8_t t = 1;
 	return static_cast<Gamephase>(t++ % 3);
 }
-uint16_t Game::troop_gained() {
+uint16_t Game::troop_gained()
+{
 	return 0;
 }
-std::string const& Game::current_player() const {
-	static std::string gtag{"GTAG"};
+std::string const& Game::current_player() const
+{
+	static std::string gtag{ "GTAG" };
 	return gtag;
 }
 uint16_t Game::time_left() const
 {
 	return 0xabcd;
 }
-std::string const& Game::winner() {
-	static std::string w{"WINNER"};
+std::string const& Game::winner()
+{
+	static std::string w{ "WINNER" };
 	return w;
 }
 Lobby& Game::lobby() const
@@ -272,6 +275,11 @@ struct Fixture {
 
 		unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
 		BOOST_TEST(code == 0x21);
+
+		buf.clear();
+		read = wss_s->read(buf);
+		unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+		BOOST_TEST(code == 0x30);
 	}
 
 	void teardown()
