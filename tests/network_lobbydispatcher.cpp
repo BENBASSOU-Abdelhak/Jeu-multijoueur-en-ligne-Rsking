@@ -95,6 +95,13 @@ Game& Lobby::start_game(const Session &) {
 
 Game::Game(GameParameters const&, Lobby& l) : m_lobby{l}
 {}
+std::string const& Game::current_player() const {
+	static std::string p{"PLAYER"};
+	return p;
+}
+uint16_t Game::troop_gained() {
+	return 0;
+}
 
 
 lobby_id_t Lobby::id() const
@@ -309,6 +316,19 @@ BOOST_AUTO_TEST_CASE(start_0x20, *boost::unit_test::timeout(1))
 
 	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
 	BOOST_TEST(code == 0x21);
+
+	buf.clear();
+	read = wss_s->read(buf);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+	BOOST_TEST(code == 0x30);
+
+	std::string gtag;
+	uint16_t nb_troops;
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code, gtag, nb_troops);
+	BOOST_TEST(code == 0x30);
+	BOOST_TEST(gtag == "PLAYER");
+	BOOST_TEST(nb_troops == 0);
 }
 
 BOOST_AUTO_TEST_CASE(start_0x20_toobig, *boost::unit_test::timeout(1))
