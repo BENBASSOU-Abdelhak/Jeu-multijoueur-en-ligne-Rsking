@@ -83,6 +83,11 @@ std::pair<Lobby::const_player_it, Lobby::const_player_it> Lobby::all_players() c
 	assert(m_gamertag_list.size() > 0);
 	return { m_gamertag_list.cbegin(), m_gamertag_list.cend() };
 }
+std::pair<Lobby::it_session, Lobby::it_session> Lobby::all_sessions() {
+	assert(m_list_session.size() > 0);
+	return { m_list_session.begin(), m_list_session.end() };
+}
+	
 Game& Lobby::start_game(const Session &) {
 	static auto t = 0;
 	++t;

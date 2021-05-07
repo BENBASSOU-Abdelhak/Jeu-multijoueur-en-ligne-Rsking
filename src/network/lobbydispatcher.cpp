@@ -75,7 +75,8 @@ size_t LobbyDispatcher::start_game(Session& session, boost::asio::const_buffer c
 		broadcast(lb_, static_cast<uint8_t>(0x21), new_game);
 		broadcast(lb_, static_cast<uint8_t>(0x30), new_game.current_player(), new_game.troop_gained());
 
-		session.change_dispatcher(std::make_unique<GameDispatcher>(new_game));
+		auto all_sessions = lb_.all_sessions();
+		std::for_each(all_sessions.first, all_sessions.second, [&](Session& session) {session.change_dispatcher(std::make_unique<GameDispatcher>(new_game));});	
 	} catch (LogicException const& e) {
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in Lobby::start_game";
 		//TODO: ban
