@@ -1,4 +1,5 @@
 #include "network/gamedispatcher.h"
+#include "network/lobbydispatcher.h"
 
 #include "network/messages.h"
 #include "network/unserialize.h"
@@ -89,6 +90,10 @@ size_t GameDispatcher::attack(Session& session, boost::asio::const_buffer const&
 			broadcast(game_.lobby(), static_cast<uint8_t>(0x23), game_.last_dead());
 			if (game_.is_finished()) { // partie finie
 				broadcast(game_.lobby(), static_cast<uint8_t>(0x22), game_.winner());
+				auto all_sessions = game_.lobby().all_sessions();
+				std::for_each(all_sessions.first, all_sessions.second, [&](Session& session) {
+					session.change_dispatcher(std::make_unique<LobbyDispatcher>(game_.lobby()));
+				});
 			}
 		}
 
