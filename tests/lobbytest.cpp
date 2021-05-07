@@ -47,6 +47,16 @@ BOOST_AUTO_TEST_CASE(test_return_list_player)
 	BOOST_TEST(*(r.first) == "Hicheme");
 }
 
+BOOST_AUTO_TEST_CASE(test_return_list_sessions)
+{
+	Lobby lobby{ 5, param_lobby_one };
+	lobby.join(*s1, "Hicheme");
+	lobby.join(*s2, "Leo");
+	auto r = lobby.all_sessions();
+	BOOST_ASSERT(*r.first == *s1);
+	BOOST_ASSERT(*(++r.first) == *s2);
+}
+
 BOOST_AUTO_TEST_CASE(test_ban_player_not_exist)
 {
 	try {

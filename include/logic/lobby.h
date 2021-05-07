@@ -24,6 +24,8 @@ class Lobby
 	Lobby(lobby_id_t id, GameParameters const& params);
 	using const_player_it = std::vector<std::string>::const_iterator;
 	std::pair<const_player_it, const_player_it> all_players() const;
+	using it_session = std::vector<std::reference_wrapper<Session>>::iterator;
+	std::pair<it_session, it_session> all_sessions();
 	Session& ban(Session const& origine, std::string const& gamertag);
 	Session& ban_in_game(std::string const& gamertag);
 	void exit(std::string const& gamertag);

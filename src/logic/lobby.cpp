@@ -134,3 +134,8 @@ __attribute__((weak)) std::pair<Lobby::const_player_it, Lobby::const_player_it> 
 {
 	return { m_gamertag_list.cbegin(), m_gamertag_list.cend() };
 }
+
+__attribute__((weak)) std::pair<Lobby::it_session, Lobby::it_session> Lobby::all_sessions()
+{
+	return { m_list_session.begin(), m_list_session.end() };
+}
