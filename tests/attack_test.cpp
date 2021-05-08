@@ -114,7 +114,7 @@ atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, 
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
         throw LogicException{0x70, "Ce n’est pas votre tour"};
 
-    if (!is_finished())
+    if (is_finished())
         throw LogicException{0x22, "La partie est finie"};
 
     if (current_phase() != Attack)
