@@ -164,7 +164,7 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 
 	BOOST_CHECK(t_game.current_phase() == 1);
 	BOOST_CHECK(t_game.nb_alive() == 3);
-	BOOST_CHECK(t_game.is_finished());
+	BOOST_CHECK(t_game.is_finished() == false);
 	t_game.player_quit(*s1, t_game.get_current_player().get_tag());
 	BOOST_CHECK(t_game.current_phase() == 1);
 	BOOST_CHECK(t_game.nb_alive() == 2);
@@ -212,7 +212,7 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 
 	t_game.get_current_player().set_disconnect();
 	BOOST_CHECK(t_game.nb_alive() == 1);
-	BOOST_CHECK(!t_game.is_finished());
+	BOOST_CHECK(t_game.is_finished());
 	BOOST_CHECK(!t_game.winner().compare("p2"));
 }
 

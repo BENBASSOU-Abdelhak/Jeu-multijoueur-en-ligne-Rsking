@@ -35,7 +35,7 @@ __attribute__((weak)) void Game::add_troops(Session const& player_asking, uint16
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
 		throw LogicException{ 0x70, "Ce n’est pas votre tour" };
 
-	if (!is_finished())
+	if (is_finished())
 		throw LogicException{ 0x22, "La partie est finie" };
 
 	if (current_phase() != Placement)
@@ -64,7 +64,7 @@ __attribute__((weak)) atk_result Game::attack(Session const& player_asking, uint
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
 		throw LogicException{ 0x70, "Ce n’est pas votre tour" };
 
-	if (!is_finished())
+	if (is_finished())
 		throw LogicException{ 0x22, "La partie est finie" };
 
 	if (current_phase() != Attack)
@@ -156,7 +156,7 @@ __attribute__((weak)) void Game::transfer(Session const& player_asking, uint16_t
 		if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
 			throw LogicException{ 0x70, "Ce n’est pas votre tour" };
 
-		if (!is_finished())
+		if (is_finished())
 			throw LogicException{ 0x22, "La partie est finie" };
 
 		if (current_phase() != Transfer)
@@ -253,7 +253,7 @@ void Game::player_quit(Session const& player_asking, std::string const& gamertag
 
 __attribute__((weak)) bool Game::is_finished() const
 {
-	return nb_alive() > 1;
+	return nb_alive() < 2;
 }
 
 Player& Game::get_current_player()
@@ -389,7 +389,7 @@ void Game::transfer_after_attack(Session const& player_asking, uint16_t src_squa
 	if (get_square_owner_map(src_square).get_square_from_last_atk() != src_square)
 		throw LogicException{ 0x60, "Ce ne sont pas les territoires de l'attaque (origine)" };
 
-	if (!is_finished())
+	if (is_finished())
 		throw LogicException{ 0x22, "La partie est finie" };
 
 	if (current_phase() != Attack)
