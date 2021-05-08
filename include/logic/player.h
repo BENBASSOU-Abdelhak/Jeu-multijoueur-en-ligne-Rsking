@@ -36,10 +36,8 @@ class Player {
 
         uint16_t get_last_atk_square() const;
         uint16_t get_square_from_last_atk() const;
-        bool is_already_transfered_after_atk() const;
         void set_last_atk_square(uint16_t square);
         void set_square_from_last_atk(uint16_t square);
-        void set_already_transfered_after_atk(bool b);
         
         void reset_rem_troops();
         void set_connected();
@@ -52,7 +50,6 @@ class Player {
         
         uint16_t m_last_attacked_square;
         uint16_t m_square_from_last_attack;
-        bool m_already_transfered_after_attack;
 
         uint16_t m_nb_troops;
         uint16_t m_nb_square;

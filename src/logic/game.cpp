@@ -282,7 +282,6 @@ void Game::set_next_current_player()
 	//on initialise les attributs du nouveau joueur courrant
 	get_current_player().set_already_transfered(false);
 	get_current_player().set_remaining_deploy_troops(troop_gained());
-	get_current_player().set_already_transfered_after_atk(false);
 	get_current_player().set_last_atk_square(0);
 	get_current_player().set_square_from_last_atk(0);
 }
@@ -407,13 +406,6 @@ void Game::transfer_after_attack(Session const& player_asking, uint16_t src_squa
 	if (m_map.get_nb_troops_square(src_square) <= nb_troops)
 		throw LogicException{ 0x62, "Pas assez de troupe" };
 
-	if (nb_troops == 0)
-		throw LogicException{ 0x62, "Nombre de troupe nul" };
-
-	if (get_square_owner_map(src_square).is_already_transfered_after_atk())
-		throw LogicException{ 0x63, "Transfert de troupe deja effectue" };
-
-	get_square_owner_map(src_square).set_already_transfered_after_atk(true);
 	remove_troops_map(src_square, nb_troops);
 	add_troops_map(dst_square, nb_troops);
 	m_waiting_transfer = false;

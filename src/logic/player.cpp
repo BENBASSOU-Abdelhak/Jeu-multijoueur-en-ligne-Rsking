@@ -7,7 +7,6 @@ Player::Player(std::string tag) :
     m_remaining_deploy_troops{0},
     m_last_attacked_square{0},
     m_square_from_last_attack{0},
-    m_already_transfered_after_attack{false},
     m_nb_troops{0},
     m_nb_square{0},
     m_nb_area{0},
@@ -114,18 +113,10 @@ uint16_t Player::get_square_from_last_atk() const {
     return m_square_from_last_attack;
 }
 
-bool Player::is_already_transfered_after_atk() const {
-    return m_already_transfered_after_attack;
-}
-
 void Player::set_last_atk_square(uint16_t square) {
     m_last_attacked_square = square;
 }
 
 void Player::set_square_from_last_atk(uint16_t square) {
     m_square_from_last_attack = square;
-}
-
-void Player::set_already_transfered_after_atk(bool b) {
-    m_already_transfered_after_attack = b;
 }
