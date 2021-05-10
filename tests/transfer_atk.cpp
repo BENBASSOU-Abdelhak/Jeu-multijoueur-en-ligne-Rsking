@@ -27,7 +27,7 @@ std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
 void create_map() {
     std::string const map_file("1");
     std::ofstream fd_map(map_file.c_str());
-    if (!fd_map)    
+    if (!fd_map)
     {
         std::cout << "ERREUR: Impossible de creer le fichier." << std::endl;
         return;
@@ -89,7 +89,7 @@ Map& Game::get_map() {
 }
 
 void Game::set_square_owner_map(uint16_t square, std::string new_owner) {
-	
+
 	m_map.set_square_owner(square, new_owner);
 	get_player_by_tag(new_owner).set_nb_square(m_map.get_nb_square_player(new_owner));
 	get_player_by_tag(new_owner).set_nb_area(m_map.get_nb_area_player(new_owner));
@@ -109,7 +109,7 @@ Player& Game::get_player_by_id(int i) {
 }
 
 atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
-    uint16_t nb_troops, int d1, int d2, int d3, int d4, int d5) 
+    uint16_t nb_troops, int d1, int d2, int d3, int d4, int d5)
 {
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
         throw LogicException{0x70, "Ce n’est pas votre tour"};
@@ -119,30 +119,30 @@ atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, 
 
     if (current_phase() != Attack)
         throw LogicException{0x30, "Mauvaise phase de jeu pour attaquer"};
-    
+
     if (get_square_owner_map(src_square) != get_current_player())
-        throw LogicException{0x50, 
+        throw LogicException{0x50,
         "Mauvaise case d'origine : La case n'appartient pas au joueur"};
-    
+
     if (get_square_owner_map(dst_square) == get_current_player())
         throw LogicException{0x51,
         "Mauvaise case de destination : La case apprtient au joueur"};
-    
+
     if (!m_map.is_neighbor_square(src_square, dst_square))
         throw LogicException{0x51, "La case destination n'est pas voisine"};
 
     if (m_map.get_nb_troops_square(src_square) < 2)
-        throw LogicException{0x50, 
+        throw LogicException{0x50,
         "Mauvais case d'origine : Pas assez de troupes pour attaquer"};
-        
+
     if (nb_troops < 1 && nb_troops > 3)
         throw LogicException{0x52,
         "Nombre de troupes erroné : Le nombre de troupes donné n'est pas bon"};
-    
+
     if (nb_troops >= m_map.get_nb_troops_square(src_square))
         throw LogicException{0x52,
         "Nombre de troupes erroné : Pas assez de troupes sur la case"};
-    
+
     struct atk_result result;
     result.defender_loose_game = false;
     result.nb_lost_troops_from_defender = 0;
@@ -156,20 +156,20 @@ atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, 
         result.attackers_dice.push_back(m_dices.get_attackers_values(i));
     for (int i = 0; i < nb_opponents_troops; i++)
         result.defenders_dice.push_back(m_dices.get_defenders_values(i));*/
-    
+
     result.attackers_dice.push_back(d1);
     result.attackers_dice.push_back(d2);
     result.attackers_dice.push_back(d3);
     result.defenders_dice.push_back(d4);
     result.defenders_dice.push_back(d5);
-    
+
     for (int i = 0; i < std::min(nb_opponents_troops, nb_troops); i++)
     {
         /*if (m_dices.get_defenders_values(i) >= m_dices.get_attackers_values(i))
             result.nb_lost_troops_from_attacker++;
         else
             result.nb_lost_troops_from_defender++;*/
-        
+
         if (result.defenders_dice[i] >= result.attackers_dice[i])
             result.nb_lost_troops_from_attacker++;
         else
@@ -179,26 +179,26 @@ atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, 
     remove_troops_map(src_square, result.nb_lost_troops_from_attacker);
     remove_troops_map(dst_square, result.nb_lost_troops_from_defender);
     result.square_conquered = m_map.get_nb_troops_square(dst_square) < 1;
-    
+
     if (result.square_conquered) {
         m_waiting_transfer = true;
         get_current_player().set_square_from_last_atk(src_square);
         get_current_player().set_last_atk_square(dst_square);
-		
+
 		std::string beaten_player = get_square_owner_map(dst_square).get_tag();
         // si l'adversaire a perdu la partie
         if (get_player_by_tag(beaten_player).get_nb_square() == 1) {
             get_player_by_tag(beaten_player).set_disconnect();
 
             result.defender_loose_game = true;
-            m_last_dead = beaten_player;
+            mark_player_as_eliminated(get_player_by_tag (beaten_player));
         }
 
         get_square_owner_map(dst_square).set_nb_square
             (get_square_owner_map(dst_square).get_nb_square() - 1);
         get_square_owner_map(src_square).set_nb_square
             (get_square_owner_map(src_square).get_nb_square() + 1);
-        
+
         m_map.set_square_owner(dst_square, get_current_player().get_tag());
 
         get_square_owner_map(src_square).set_nb_area(
@@ -210,12 +210,12 @@ atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, 
             m_map.get_area_points_player(beaten_player));
         get_player_by_tag(beaten_player).set_nb_area(
             m_map.get_nb_area_player(beaten_player));
-        
-        
+
+
         remove_troops_map(src_square, 1);
         add_troops_map(dst_square, 1);
     }
-        
+
     return result;
 }
 /******************************************************************************/
@@ -248,9 +248,9 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap) {
 	t_game.maj_score_player("p1");
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
-	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());	
+	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
 	t_game.add_troops(*s1, 0, 3);
-	
+
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
@@ -258,7 +258,7 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap) {
 
 	t_game.skip(*s1);
 
-    
+
     BOOST_TEST(t_game.get_current_player().get_square_from_last_atk() == 0);
     BOOST_TEST(t_game.get_current_player().get_last_atk_square() == 0);
 
@@ -340,7 +340,7 @@ BOOST_FIXTURE_TEST_CASE(attack_loose_and_transfer, CreateMap) {
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
 	t_game.add_troops(*s1, 0, 3);
-	
+
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
@@ -395,7 +395,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap) {
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
 	t_game.add_troops(*s1, 0, 3);
-	
+
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
@@ -404,7 +404,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap) {
     t_game.skip(*s1);
     t_game.skip(*s1);
     t_game.add_troops(*s2, 3, 1);
-    
+
     t_game.skip(*s2);
     // pas son tour de skip
     try {
@@ -433,7 +433,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap) {
 
     t_game.get_player_by_tag("p1").set_disconnect();
     t_game.get_player_by_tag("p3").set_disconnect();
-    
+
     // plus de joueur
     try {
 		t_game.transfer(*s2, 3, 6, 1);

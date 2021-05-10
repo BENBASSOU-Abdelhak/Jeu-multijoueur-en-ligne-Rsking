@@ -65,6 +65,10 @@ set(jwt-cpp_DIR "/usr/local/cmake/jwt-cpp")
 find_package(jwt-cpp CONFIG REQUIRED)
 target_link_libraries(risking_lib PUBLIC jwt-cpp::jwt-cpp)
 
+find_package(ODBC)
+target_include_directories(risking_lib PUBLIC ${ODBC_INCLUDE_DIRS})
+target_link_libraries(risking_lib PUBLIC ODBC::ODBC)
+
 # Tests
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND BUILD_TEST)
 	include(CTest)

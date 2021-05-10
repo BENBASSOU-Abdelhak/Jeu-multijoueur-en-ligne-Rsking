@@ -13,6 +13,9 @@ function(create_test test_path)
 	target_link_libraries(${name} PUBLIC risking_lib ${Boost_LIBRARIES})
 	add_dependencies(${name} risking_lib)
 
+	target_include_directories(${name} PUBLIC ${ODBC_INCLUDE_DIRS})
+	target_link_libraries(${name} PUBLIC ODBC::ODBC)
+
 	message("-- adding test: ${name}")
 	add_test(${name} ${name})
 	list(APPEND ALL_TEST_NAMES ${tname})
@@ -39,13 +42,13 @@ if ((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME) AND COVERAGE)
 		NAME coverage
 		EXECUTABLE ctest
 		BASE_DIR ${PROJECT_SOURCE_DIR}
-		EXCLUDE "tests/*"
+		EXCLUDE "tests/*" "include/otlv4"
 		DEPENDENCIES risking_lib ${ALL_TEST_NAMES})
 	setup_target_for_coverage_gcovr_html(
 		NAME coverage_html
 		EXECUTABLE ctest
 		BASE_DIR ${PROJECT_SOURCE_DIR}
-		EXCLUDE "tests/*"
+		EXCLUDE "tests/*"  "include/otlv4"
 		DEPENDENCIES risking_lib ${ALL_TEST_NAMES})
 endif()
 

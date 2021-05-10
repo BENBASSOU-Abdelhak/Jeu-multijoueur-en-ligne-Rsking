@@ -9,6 +9,7 @@
 #include "logicexception.h"
 
 #include <boost/log/trivial.hpp>
+#include <dbms.h>
 
 GameDispatcher::GameDispatcher(Game& game) : game_(game)
 {
@@ -90,7 +91,17 @@ size_t GameDispatcher::attack(Session& session, boost::asio::const_buffer const&
 			broadcast(game_.lobby(), static_cast<uint8_t>(0x23), game_.last_dead());
 			if (game_.is_finished()) { // partie finie
 				broadcast(game_.lobby(), static_cast<uint8_t>(0x22), game_.winner());
-				auto all_sessions = game_.lobby().all_sessions();
+
+				// Sauvegarder la partie dans la BDD
+				try {
+				    if (!DBMS::get ().add_game(game_)) {
+                        BOOST_LOG_TRIVIAL(error) << "DBMS::add_game has returned false";
+				    }
+				} catch (const otl_exception &oe) {
+                    BOOST_LOG_TRIVIAL(error) << "Can't connect to database";
+				}
+
+                auto all_sessions = game_.lobby().all_sessions();
 				std::for_each(all_sessions.first, all_sessions.second, [&](Session& session) {
 					session.change_dispatcher(std::make_unique<LobbyDispatcher>(game_.lobby()));
 				});

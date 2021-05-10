@@ -1,20 +1,7 @@
--- Tested on MariaDB 10.3.25
-
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
-
 -- -----------------------------------------------------
--- Schema risking
+-- Table `user`
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `risking` DEFAULT CHARACTER SET utf8 ;
-USE `risking` ;
-
-
--- -----------------------------------------------------
--- Table `risking`.`user`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `risking`.`user` (
+CREATE TABLE IF NOT EXISTS `user` (
   `id` VARBINARY(16) NOT NULL,
   `gamertag` VARCHAR(45) NOT NULL,
   `password` BINARY(128) NULL,
@@ -27,9 +14,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `risking`.`game`
+-- Table `game`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `risking`.`game` (
+CREATE TABLE IF NOT EXISTS `game` (
   `id` VARBINARY(16) NOT NULL,
   `start_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
   `end_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
@@ -39,9 +26,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `risking`.`game_has_user`
+-- Table `game_has_user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `risking`.`game_has_user` (
+CREATE TABLE IF NOT EXISTS `game_has_user` (
   `rank` SMALLINT UNSIGNED NOT NULL CHECK(`rank` > 0),
   `game_id` VARBINARY(16) NOT NULL,
   `user_id` VARBINARY(16) NOT NULL,
@@ -50,12 +37,12 @@ CREATE TABLE IF NOT EXISTS `risking`.`game_has_user` (
   INDEX `fk_game_has_user_user1_idx` (`user_id` ASC),
   CONSTRAINT `fk_game_has_user_game1`
     FOREIGN KEY (`game_id`)
-    REFERENCES `risking`.`game` (`id`)
+    REFERENCES `game` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_game_has_user_user1`
     FOREIGN KEY (`user_id`)
-    REFERENCES `risking`.`user` (`id`)
+    REFERENCES `user` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
     CONSTRAINT game_rank UNIQUE (game_id, `rank`))
@@ -63,9 +50,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `risking`.`ban`
+-- Table `ban`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `risking`.`ban` (
+CREATE TABLE IF NOT EXISTS `ban` (
   `id` VARBINARY(16) NOT NULL,
   `expiration` TIMESTAMP NULL,
   `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
@@ -75,12 +62,7 @@ CREATE TABLE IF NOT EXISTS `risking`.`ban` (
   INDEX `fk_ban_user1_idx` (`user_id` ASC),
   CONSTRAINT `fk_ban_user1`
     FOREIGN KEY (`user_id`)
-    REFERENCES `risking`.`user` (`id`)
+    REFERENCES `user` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

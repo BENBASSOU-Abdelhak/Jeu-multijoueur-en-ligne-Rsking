@@ -391,7 +391,7 @@ Le module devra fournir les fonctionnalités suivantes : +
 * *_Ajouter_* une partie terminée. +
 * *_Bannir_* un joueur. +
 
-NOTE: On utilisera la librairie https://www.sqlapi.com/[SQLAPI{pp}]
+NOTE: On utilisera la librairie http://otl.sourceforge.net/[OTLv4]
 
 #### Concurrence
 
