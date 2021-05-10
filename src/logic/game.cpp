@@ -295,7 +295,7 @@ __attribute__((weak)) std::string const& Game::winner()
 {
 	for (uint16_t i = 0; i < (int)m_players.size(); i++)
 		if (m_players.at(i).is_online() && m_players.at(i).get_nb_square() != 0)
-			return get_square_owner_map(i).get_tag();
+			return m_players.at(i).get_tag();
 	return get_current_player().get_tag();
 }
 
