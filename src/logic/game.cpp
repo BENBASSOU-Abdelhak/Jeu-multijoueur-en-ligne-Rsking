@@ -2,7 +2,7 @@
 #include "logic/lobby.h"
 
 __attribute__((weak)) Game::Game(GameParameters const& params, Lobby& lobby)
-	: m_phase(Placement), m_i_current_player(0), m_last_dead(""), m_lobby(lobby), m_waiting_transfer(false)
+	: m_phase(Placement), m_i_current_player(0), m_lobby(lobby), m_waiting_transfer(false)
 {
 	std::vector<std::string> tags;
 	auto ret = lobby.all_players();
@@ -124,7 +124,7 @@ __attribute__((weak)) atk_result Game::attack(Session const& player_asking, uint
 			get_player_by_tag(beaten_player).set_disconnect();
 
 			result.defender_loose_game = true;
-			m_last_dead = beaten_player;
+            mark_player_as_eliminated(get_player_by_tag (beaten_player));
 		}
 
 		get_square_owner_map(dst_square).set_nb_square(get_square_owner_map(dst_square).get_nb_square() - 1);
@@ -242,7 +242,7 @@ void Game::player_quit(Session const& player_asking, std::string const& gamertag
 		throw LogicException{ 0x16, "Le joueur n'existe pas dans la game" };
 
 	get_player_by_tag(gamertag).set_disconnect();
-	m_last_dead = get_player_by_tag(gamertag).get_tag();
+    mark_player_as_eliminated(get_player_by_tag (gamertag));
 	// TODO prevenir que un joueur a quitté
 
 	if (get_current_player() == get_player_by_tag(gamertag)) {
@@ -340,7 +340,7 @@ __attribute__((weak)) size_t Game::nb_alive() const
 
 __attribute__((weak)) std::string const& Game::last_dead() const
 {
-	return m_last_dead;
+	return m_eliminated_players.at (m_eliminated_players.size() - 1).get_tag();
 }
 
 __attribute__((weak)) Lobby& Game::lobby() const
@@ -419,4 +419,8 @@ __attribute__((weak)) Map const& Game::get_map() const
 __attribute__((weak)) uint16_t Game::time_left() const
 { //TODO
 	return 1;
+}
+
+void Game::mark_player_as_eliminated(Player& player) {
+    m_eliminated_players.push_back (player);
 }

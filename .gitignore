@@ -13,3 +13,6 @@ build/
 
 # Ignore all vscode folder
 **/.vscode/**
+
+# Download by unit-tests
+libs/

@@ -20,7 +20,7 @@ std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
 void create_map() {
     std::string const map_file("1");
     std::ofstream fd_map(map_file.c_str());
-    if (!fd_map)    
+    if (!fd_map)
     {
         std::cout << "ERREUR: Impossible de creer le fichier." << std::endl;
         return;
@@ -170,7 +170,7 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 	BOOST_CHECK(t_game.nb_alive() == 2);
 	BOOST_CHECK(!t_game.get_player_by_tag("p1").is_online());
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
-	
+
 	t_game.get_current_player().reset_rem_troops();
 	t_game.skip(*s2);
 	BOOST_CHECK(t_game.current_phase() == 2);
@@ -182,7 +182,7 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 
 	t_game.skip(*s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
-	
+
 	t_game.get_current_player().reset_rem_troops();
 	t_game.skip(*s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
@@ -242,7 +242,7 @@ BOOST_FIXTURE_TEST_CASE(troops_gained, CreateMap)
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
-	
+
 	BOOST_CHECK(t_game.troop_gained() == 3);
 	t_game.set_current_player(1);
 	BOOST_CHECK(t_game.troop_gained() == 1);
@@ -322,7 +322,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 	t_game.get_player_by_tag("p1").set_remaining_deploy_troops(3);
 	t_game.get_player_by_tag("p2").set_remaining_deploy_troops(1);
 	t_game.get_player_by_tag("p3").set_remaining_deploy_troops(2);
-	
+
 	/*** etat actuel ***/
 	// p1 : troop_gained() == 3
 	// p2 : troop_gained() == 1
@@ -335,7 +335,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 		try {
 			t_game.add_troops(*s1, i, 1);
 			BOOST_TEST(false);
-		} catch (LogicException const& e) { BOOST_TEST(true);}		
+		} catch (LogicException const& e) { BOOST_TEST(true);}
 	}
 
 	// plus de troupe que le joueur en possede
@@ -376,7 +376,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 	t_game.add_troops(*s1, 0, 1);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 5);
 	t_game.skip(*s1);
-	
+
 	// le joeur reessaie de transferer des troupes dans une autre phase
 	try {
 		t_game.add_troops(*s1, 0, 1);
@@ -408,7 +408,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 		BOOST_TEST(false);
 	} catch (LogicException const& e) { BOOST_TEST(true);}
 
-	// test que la maj de get_troops_gained() est faite 
+	// test que la maj de get_troops_gained() est faite
 	t_game.set_square_owner_map(3, "p1");
 	t_game.skip(*s3);
 
@@ -454,7 +454,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap) {
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
 	t_game.get_map().add_troops(0, 2);
-	
+
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 4 troupes et tous les autres 2 troupes
@@ -532,7 +532,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap) {
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(1) == 3);
 	for (int i = 2; i <= 8; i++)
 		BOOST_TEST(t_game.get_map().get_nb_troops_square(i) == 2);
-	
+
 	// transferer deux fois des troupes dans la meme phase
 	try {
 		t_game.transfer(*s1, 0, 1, 1);
@@ -573,7 +573,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap) {
 		t_game.transfer(*s2, 4, 5, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) { BOOST_TEST(true);};
-	
+
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 2);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(5) == 2);
 	t_game.transfer(*s2, 3, 5, 1);
@@ -593,3 +593,23 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap) {
 }
 
 
+BOOST_FIXTURE_TEST_CASE(test_mark_player_as_eliminated, CreateMap)
+{
+    /************ setup ****************/
+    GameParameters gp;
+    gp.id_map = 1;
+    gp.nb_players = 3;
+    Lobby l{1, gp};
+    l.join (*s1, "p1");
+    l.join (*s2, "p2");
+    l.join (*s3, "p3");
+    Game t_game (gp, l);
+    /*******************/
+
+    t_game.player_quit (*s1, "p1");
+    BOOST_TEST(t_game.last_dead() == "p1");
+
+    t_game.player_quit (*s2, "p2");
+    BOOST_TEST(t_game.last_dead() == "p2");
+    BOOST_TEST(t_game.winner() == "p3");
+}

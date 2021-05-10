@@ -1,6 +1,7 @@
 #ifndef INCLUDE__LOGIC__GAME_H
 #define INCLUDE__LOGIC__GAME_H
 
+#include <dbms.h>
 #include "logic/atk_result.h"
 #include "logic/map.h"
 #include "logic/dice_roll.h"
@@ -27,11 +28,11 @@ class Game {
         void add_troops(Session const& player_asking, uint16_t dst_square, uint16_t nb_troops);
         atk_result attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
             uint16_t nb_troops);
-        void transfer(Session const& player_asking, uint16_t src_square, uint16_t dst_square, 
+        void transfer(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
             uint16_t nb_troops);
         void transfer_after_attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
             uint16_t nb_troops);
-        
+
         void skip(Session const& player_asking);
         //quitté la partie, ban ou perdu
         void player_quit(Session const& player_asking, std::string const& gamertag);
@@ -39,9 +40,9 @@ class Game {
 
         Player& get_current_player();
         void set_next_current_player();
-        
+
         uint16_t troop_gained();
-       
+
 
         //void set_ban_player(Player player);
         //void set_end_game(Player player);
@@ -72,16 +73,21 @@ class Game {
         atk_result attack_test(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
             uint16_t nb_troops, int d1, int d2, int d3, int d4, int d5);
         Player& get_player_by_id(int i);
-    
+
+        void mark_player_as_eliminated(Player& player);
+
+        friend bool DBMS::add_game (Game &game);
+
     private:
         Map m_map;
         Dice_roll m_dices;
         Gamephase m_phase;
-        
+
         std::vector<Player> m_players;
         uint16_t m_i_current_player;
 
-        std::string m_last_dead;
+        std::vector<Player> m_eliminated_players;
+
         Lobby& m_lobby;
 
         bool m_waiting_transfer;

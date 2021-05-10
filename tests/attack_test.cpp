@@ -191,7 +191,7 @@ atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, 
             get_player_by_tag(beaten_player).set_disconnect();
 
             result.defender_loose_game = true;
-            m_last_dead = beaten_player;
+            mark_player_as_eliminated(get_player_by_tag (beaten_player));
         }
 
         get_square_owner_map(dst_square).set_nb_square

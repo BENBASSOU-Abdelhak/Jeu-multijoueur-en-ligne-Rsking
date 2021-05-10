@@ -24,6 +24,7 @@
 
 #include "configuration.h"
 #include <openssl/ssl.h>
+#include <dbms.h>
 #include "../utils/ssl_injection.cpp"
 
 using namespace boost::asio;
@@ -183,6 +184,10 @@ JWT_t JWT::decode(std::string const& jwt)
 	JWT_t ret;
 	ret.name = jwt;
 	return ret;
+}
+bool DBMS::add_game (Game &)
+{
+    return true;
 }
 
 struct Fixture {

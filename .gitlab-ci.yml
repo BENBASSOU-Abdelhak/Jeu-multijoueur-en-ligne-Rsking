@@ -26,9 +26,14 @@ test:
     - build # Download only build artifacts
   before_script: # Trying to fix OpenSSL dev
     - apk add openssl openssl-dev
+    - chmod u+x **/*.sh && ./tools/prepare_sql_tests.sh # Prepare SQL tests
   script:
     - cd build
-    - ctest -T test --verbose --no-compress-output --output-on-failure
+    - cat ~/.odbc.ini
+    - ls /usr/local/lib/mariadb
+    - ldd /usr/local/lib/mariadb/libmaodbc.so
+    - isql -v risking-test
+    - ctest -T test --verbose --no-compress-output --output-on-failure && ../tools/clean_db.sh
   after_script:
     - python3 CMakeModules/CTest2JUnit.py build CMakeModules/CTest2JUnit.xsl > junit.xml
   artifacts:
@@ -43,10 +48,11 @@ coverage:
   stage: deploy
   before_script: # Trying to fix OpenSSL dev
     - apk add openssl openssl-dev
+    - chmod u+x **/*.sh && ./tools/prepare_sql_tests.sh # Prepare SQL tests
   script:
     - cmake -DCOVERAGE=ON -DCMAKE_BUILD_TYPE=Debug .
-    - make all coverage
-    - make all coverage_html
+    - make all coverage && ./tools/clean_db.sh
+    - make all coverage_html && ./tools/clean_db.sh
     - mv coverage_html coverage
     - chmod u+x utils/coverage_report.py
     - python3 utils/coverage_report.py
