@@ -21,9 +21,8 @@ RUN apk add --no-cache libstdc++
 RUN apk add --no-cache boost-dev
 # Required for database connection
 RUN apk add --no-cache unixodbc
-# Required for database connection
-RUN apk -U add mariadb-connector-odbc --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing --allow-untrusted
 
+COPY --from=compile-part /usr/local/lib/mariadb/libmaodbc.so /usr/local/lib/mariadb/libmaodbc.so
 COPY --from=compile-part /root/risking-serveur/risking /root/risking-serveur/risking
 COPY --from=compile-part /root/risking-serveur/1 /root/risking-serveur/1
 
