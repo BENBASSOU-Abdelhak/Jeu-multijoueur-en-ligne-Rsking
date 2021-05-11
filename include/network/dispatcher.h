@@ -1,7 +1,9 @@
 #ifndef INCLUDE__NETWORK__DISPATCHER_H
 #define INCLUDE__NETWORK__DISPATCHER_H
 
-#include "network/session.h"
+#include <boost/asio/buffer.hpp>
+
+class Session;
 
 /* Classe Dispatcher générique */
 

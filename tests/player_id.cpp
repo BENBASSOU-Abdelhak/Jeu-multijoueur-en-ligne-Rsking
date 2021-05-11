@@ -9,6 +9,12 @@
 #include "logic/lobbypool.h"
 #include "logic/lobby.h"
 
+#include "network/session.h"
+#include "logicexception.h"
+
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
+
 #include <filesystem>
 
 boost::asio::io_context ctx{ 1 };

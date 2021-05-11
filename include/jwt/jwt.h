@@ -12,8 +12,9 @@
 
 using uuid_t = std::string; // uint128_t
 using timepoint = std::chrono::time_point<std::chrono::system_clock>;
-inline uuid_t to_uuid(std::string const& str) {
-	return str;//std::stoll(str);
+inline uuid_t to_uuid(std::string const& str)
+{
+	return str; //std::stoll(str);
 }
 
 struct JWT_t {
@@ -38,9 +39,9 @@ class JWT
     private:
 	JWT(std::string const& path_to_key, std::string const& path_to_certificate);
 
-//#ifdef JWT
+	//#ifdef JWT
 	decltype(jwt::verify()) verifier;
-//#endif
+	//#endif
 };
 
 #endif

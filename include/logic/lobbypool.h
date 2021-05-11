@@ -7,12 +7,12 @@
 
 #include "lobby.h"
 #include <random>
-#include <limits>
 
 #include <string>
+#include <map>
 
 using lobby_id_t = uint64_t;
-struct Session;
+class Session;
 
 class LobbyPool
 {
