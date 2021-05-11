@@ -170,6 +170,29 @@ _uint8_t_:string:string:...:string
 
 <<<
 
+#### Récupérer un salon publique libre
+
+Il est possible de récupérer l'ID d'un salon publique avec au moins une place restante en envoyant un message.
+
+.Message lobby libre (client)
+:===
+Code:JWT
+*0x18*:JWT généré par le serveur
+_uint8_t_:string
+:===
+
+
+.Message réponse ID (serveur)
+:===
+Code:ID
+*0x19*:ID d'un Lobby **ou 0**
+_uint8_t_:_lobby_id_t_
+:===
+
+IMPORTANT: Si aucun Lobby publique n'est disponible, **renvoie l'ID 0**.
+
+<<<
+
 #### Quitter ou Expulser du salon
 
 Le créateur du salon peut choisir d'expulser quelqu'un du salon.

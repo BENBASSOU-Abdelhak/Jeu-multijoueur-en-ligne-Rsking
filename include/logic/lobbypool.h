@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 
+#define MAX_LOBBY 1024
 using lobby_id_t = uint64_t;
 class Session;
 
@@ -25,6 +26,7 @@ class LobbyPool
 	Lobby const& getLobby(lobby_id_t lobby_id) const;
 	size_t get_nb_lobby() const;
 	size_t get_max_lobby() const;
+	lobby_id_t lobby_dispo(Session& session, std::string const& gamertag);
 
     private:
 	LobbyPool(size_t max_lobbies);

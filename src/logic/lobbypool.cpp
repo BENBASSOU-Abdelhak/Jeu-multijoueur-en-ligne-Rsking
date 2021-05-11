@@ -6,6 +6,7 @@
 #include <limits>
 #include <cassert>
 
+
 __attribute__((weak)) LobbyPool::LobbyPool(size_t max_lobbies) : m_nb_lobby{ 0 }, m_max_lobby{ max_lobbies }
 {
 	std::uniform_int_distribution<lobby_id_t> m_distrib(0, std::numeric_limits<lobby_id_t>::max());
@@ -13,7 +14,7 @@ __attribute__((weak)) LobbyPool::LobbyPool(size_t max_lobbies) : m_nb_lobby{ 0 }
 
 __attribute__((weak)) LobbyPool& LobbyPool::get()
 {
-	static LobbyPool lp(64);
+	static LobbyPool lp(MAX_LOBBY);
 	return lp;
 }
 
@@ -48,7 +49,7 @@ __attribute__((weak)) Lobby& LobbyPool::join_lobby(lobby_id_t lobby_id, Session&
 	if (itr == m_lobby_list.end())
 		throw LogicException(0x11, "ID de salon incorrect !");
 
-	if (m_lobby_list.at(lobby_id).get_started() != nullptr)
+	if (m_lobby_list.at(lobby_id).is_started())
 		throw LogicException(0x13, "Partie déjà en cours!");
 
 	bool his_ban = m_lobby_list.at(lobby_id).verification_join(gamertag);
@@ -80,4 +81,19 @@ size_t LobbyPool::get_nb_lobby() const
 size_t LobbyPool::get_max_lobby() const
 {
 	return m_max_lobby;
+}
+
+__attribute__((weak)) lobby_id_t LobbyPool::lobby_dispo(Session&, std::string const& gamertag)
+{
+	//Parcourir les lobby 1 par 1
+	for (auto & lobby : m_lobby_list) {
+	//lobby est un Lobby
+		//Si il reste de la place, que la game et pas start et que le joueur a pas été ban de ce salon ok
+		if(lobby.second.get_remaining_place() > 0 && !lobby.second.is_started() && lobby.second.verification_join(gamertag) == false)
+		{
+			return lobby.second.id();
+		} 
+	}
+	//Sinon renvoi une erreur
+	return 0;
 }

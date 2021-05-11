@@ -60,6 +60,10 @@ Lobby& LobbyPool::join_lobby(lobby_id_t lid, Session& s, const std::string& gtag
 	lb.join(s, gtag);
 	return lb;
 }
+lobby_id_t LobbyPool::lobby_dispo(Session&, const std::string&)
+{
+	return 0;
+}
 Lobby::Lobby(lobby_id_t id, const GameParameters&) : m_id{ id }
 {
 }
@@ -324,6 +328,63 @@ BOOST_AUTO_TEST_CASE(join_0x12_logicexception, *boost::unit_test::timeout(1))
 
 	std::vector<char> msg;
 	create_buf(msg, code, lid, jwt);
+	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
+
+	wss_s->write(cbuf);
+
+	boost::beast::flat_buffer buf;
+	size_t read = wss_s->read(buf);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+	BOOST_TEST(code == 0x0);
+}
+
+BOOST_AUTO_TEST_CASE(lobby_dispo_0x16, *boost::unit_test::timeout(1))
+{
+	uint8_t code = 0x18;
+	std::string jwt{ "JWT_DUMMY" };
+	uint64_t lid;
+
+	std::vector<char> msg;
+	create_buf(msg, code, jwt);
+	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
+
+	wss_s->write(cbuf);
+
+	boost::beast::flat_buffer buf;
+	size_t read = wss_s->read(buf);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+	BOOST_TEST(code == 0x19);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code, lid);
+	BOOST_TEST(lid == 0);
+}
+
+BOOST_AUTO_TEST_CASE(join_0x18_toosmall, *boost::unit_test::timeout(1))
+{
+	uint8_t code = 0x18;
+
+	std::vector<char> msg;
+	create_buf(msg, code);
+	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
+
+	wss_s->write(cbuf);
+
+	boost::beast::flat_buffer buf;
+	size_t read = wss_s->read(buf);
+
+	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
+	BOOST_TEST(code == 0x0);
+}
+
+BOOST_AUTO_TEST_CASE(join_0x18_badjwt, *boost::unit_test::timeout(1))
+{
+	uint8_t code = 0x18;
+	std::string jwt{ "" };
+
+	std::vector<char> msg;
+	create_buf(msg, code, jwt);
 	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
 
 	wss_s->write(cbuf);

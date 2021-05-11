@@ -37,6 +37,7 @@ class Lobby
 	GameParameters const& parameters() const;
 	bool verification_join(std::string const& gamertag) const;
 	std::shared_ptr<Game> get_started() const;
+	bool is_started() const;
 
 	~Lobby() = default;
 

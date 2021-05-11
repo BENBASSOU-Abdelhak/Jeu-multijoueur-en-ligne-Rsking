@@ -20,7 +20,7 @@ void Dice_roll::set_dice_values()
 
 	std::sort(attackers_values.begin(), attackers_values.end(), std::greater<uint8_t>());
 	std::sort(defenders_values.begin(), defenders_values.end(), std::greater<uint8_t>());
-};
+}
 
 uint8_t Dice_roll::get_defenders_values(uint8_t dice) const
 {

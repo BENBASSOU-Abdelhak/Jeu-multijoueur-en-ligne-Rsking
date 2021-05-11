@@ -16,6 +16,7 @@ class LobbyPoolDispatcher : public Dispatcher
 			size_t bytes_transferred) override;
 
     private:
+	size_t public_lobby(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred);
 	size_t create_lobby(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred);
 	size_t join_lobby(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred);
 	LobbyPool& lbp_;

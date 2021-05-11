@@ -270,6 +270,8 @@ Renvoie le salon créé salon.
 * *join_lobby*(_lobby_id_t_ lid, _Session&_ session, _std::string const&_ gamertag) -> _Lobby&_ : Le joueur rejoint un lobby existant. +
 Renvoie le salon rejoint.
 
+* *lobby_dispo*(_Session&_ session, _std::string const&_ gamertag) -> _lobby_id_t_ : Récupère un salon publique joignable. +
+
 * *_private_* *destroy_lobby*(_lobby_id_t_ lid) : détruit un lobby. Seul le Lobby lui même peut appeller cette fonction.
 
 WARNING: Il faut penser à garder un lien vers le LobbyPool dans le Lobby pour pouvoir appeller *destroy_lobby*

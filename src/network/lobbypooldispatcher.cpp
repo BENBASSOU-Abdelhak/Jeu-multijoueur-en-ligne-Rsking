@@ -30,6 +30,9 @@ __attribute__((weak)) size_t LobbyPoolDispatcher::dispatch(uint8_t code, Session
 	case 0x12:
 		return join_lobby(session, buf, bytes_transferred);
 		break;
+	case 0x18:
+		return public_lobby(session, buf, bytes_transferred);
+		break;
 	default:
 		BOOST_LOG_TRIVIAL(warning) << "Bad message id received in LobbyPoolDispatcher : " << std::hex
 					   << static_cast<uint16_t>(code);
@@ -73,7 +76,8 @@ size_t LobbyPoolDispatcher::create_lobby(Session& session, boost::asio::const_bu
 	return read;
 }
 
-size_t LobbyPoolDispatcher::join_lobby(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
+size_t LobbyPoolDispatcher::join_lobby(Session& session, boost::asio::const_buffer const& buf,
+					 size_t bytes_transferred)
 {
 	if (bytes_transferred < sizeof(lobby_id_t)) {
 		BOOST_LOG_TRIVIAL(warning) << "Message received with code 0x12 is too small";
@@ -107,6 +111,31 @@ size_t LobbyPoolDispatcher::join_lobby(Session& session, boost::asio::const_buff
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in LobbyPool::join_lobby";
 		send_error(session, e.subcode(), e.what());
 	}
+
+	return read;
+}
+
+size_t LobbyPoolDispatcher::public_lobby(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
+{
+	if (bytes_transferred < 1) {
+		BOOST_LOG_TRIVIAL(warning) << "Message received with code 0x16 is too small";
+		send_error(session, 0x0, "Message with code 0x16 is too small");
+		return bytes_transferred;
+	}
+
+	std::string jwt;
+	size_t read = unserialize(static_cast<const char*>(buf.data()), bytes_transferred, jwt);
+
+	if (jwt.size() == 0 || !JWT::get().verify(jwt)) {
+		BOOST_LOG_TRIVIAL(warning) << "Invalid JWT received: " << jwt;
+		send_error(session, 0x0, "JWT is invalid.");
+		return read;
+	}
+
+	JWT_t token = JWT::get().decode(jwt);
+
+	auto id = lbp_.lobby_dispo(session, token.name);
+	send_message(session, static_cast<uint8_t>(0x19), id);
 
 	return read;
 }
