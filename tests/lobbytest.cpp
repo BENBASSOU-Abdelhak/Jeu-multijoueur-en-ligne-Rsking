@@ -3,6 +3,11 @@
 #include "logic/lobby.h"
 #include "logic/lobbypool.h"
 #include "network/lobbypooldispatcher.h"
+#include "network/session.h"
+#include "logicexception.h"
+
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 boost::asio::io_context ctx{ 1 };
 auto s1 = std::make_shared<Session>(boost::asio::ip::tcp::socket{ ctx },

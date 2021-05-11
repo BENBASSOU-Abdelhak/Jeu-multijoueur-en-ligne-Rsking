@@ -22,7 +22,7 @@ class SslContext
 	std::string const& path_to_key() const;
 	std::string const& path_to_certificate() const;
 
-	operator boost::asio::ssl::context & ();
+	operator boost::asio::ssl::context&();
 
     private:
 	/**

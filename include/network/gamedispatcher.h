@@ -5,7 +5,7 @@
 
 /* Classe LobbyPoolDispatcher */
 
-struct Game;
+class Game;
 
 class GameDispatcher : public Dispatcher
 {

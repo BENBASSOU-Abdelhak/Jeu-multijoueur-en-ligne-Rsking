@@ -68,8 +68,8 @@ BOOST_AUTO_TEST_CASE(good_jwt)
 	BOOST_TEST(jwt.iss == "risking.zefresk.com");
 	BOOST_TEST(jwt.uid == "1");
 	BOOST_TEST(jwt.name == "Matheo");
-	BOOST_TEST(jwt.iat.time_since_epoch().count()/ns == 1516239022);
-	BOOST_TEST(jwt.exp.time_since_epoch().count()/ns == 2000000000);
-	BOOST_TEST(jwt.nbf.time_since_epoch().count()/ns == 1516239022);
+	BOOST_TEST(jwt.iat.time_since_epoch().count() / ns == 1516239022);
+	BOOST_TEST(jwt.exp.time_since_epoch().count() / ns == 2000000000);
+	BOOST_TEST(jwt.nbf.time_since_epoch().count() / ns == 1516239022);
 	BOOST_TEST(jwt.jti == "0000000000");
 }

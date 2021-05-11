@@ -1,6 +1,10 @@
 #include "logic/lobbypool.h"
-
 #include "generator.h"
+
+#include "logicexception.h"
+
+#include <limits>
+#include <cassert>
 
 __attribute__((weak)) LobbyPool::LobbyPool(size_t max_lobbies) : m_nb_lobby{ 0 }, m_max_lobby{ max_lobbies }
 {

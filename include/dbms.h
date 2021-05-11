@@ -9,31 +9,30 @@ struct Game;
 
 class DBMS
 {
-    DBMS ()
-    = default;
+	DBMS() = default;
 
-    otl_connect m_con{};
+	otl_connect m_con{};
 
-public:
-    DBMS (DBMS const &) = delete;
+    public:
+	DBMS(DBMS const&) = delete;
 
-    DBMS &operator= (DBMS const &) = delete;
+	DBMS& operator=(DBMS const&) = delete;
 
-    static DBMS &get ()
-    {
-        static DBMS db;
-        return db;
-    }
+	static DBMS& get()
+	{
+		static DBMS db;
+		return db;
+	}
 
-    void login (const std::string &connect_str);
+	void login(const std::string& connect_str);
 
-    void logout ();
+	void logout();
 
-    bool can_join (std::string const &gamertag);
+	bool can_join(std::string const& gamertag);
 
-    bool ban (std::string const &gamertag, std::string const &reason);
+	bool ban(std::string const& gamertag, std::string const& reason);
 
-    bool add_game (Game &game);
+	bool add_game(Game& game);
 };
 
 #endif

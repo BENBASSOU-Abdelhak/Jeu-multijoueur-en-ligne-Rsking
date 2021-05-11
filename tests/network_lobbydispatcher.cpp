@@ -53,12 +53,12 @@ constexpr lobby_id_t BAD_LID = 0xffffffff;
 Lobby& LobbyPool::join_lobby(lobby_id_t lid, Session& s, const std::string& gtag)
 {
 	if (lid == BAD_LID)
-		throw LogicException{0x3, "DUMMY EXCEPTION" };
+		throw LogicException{ 0x3, "DUMMY EXCEPTION" };
 
 	lb->join(s, gtag);
 	return *lb;
 }
-Lobby::Lobby(lobby_id_t id, const GameParameters&) : m_id{id}
+Lobby::Lobby(lobby_id_t id, const GameParameters&) : m_id{ id }
 {
 }
 GameParameters const& Lobby::parameters() const
@@ -70,44 +70,51 @@ GameParameters const& Lobby::parameters() const
 
 	return gp;
 }
-void Lobby::join(Session &session, const std::string &gamertag) {
+void Lobby::join(Session& session, const std::string& gamertag)
+{
 	m_list_session.push_back(session);
 	m_gamertag_list.push_back(gamertag);
 }
-Session& Lobby::ban(const Session & se, const std::string &gamertag) {
+Session& Lobby::ban(const Session& se, const std::string& gamertag)
+{
 	if (gamertag == "FAUX")
 		throw LogicException{ 0x2, "DUMMY ERROR" };
 	return const_cast<Session&>(se);
 }
-std::pair<Lobby::const_player_it, Lobby::const_player_it> Lobby::all_players() const {
+std::pair<Lobby::const_player_it, Lobby::const_player_it> Lobby::all_players() const
+{
 	assert(m_gamertag_list.size() > 0);
 	return { m_gamertag_list.cbegin(), m_gamertag_list.cend() };
 }
-std::pair<Lobby::it_session, Lobby::it_session> Lobby::all_sessions() {
+std::pair<Lobby::it_session, Lobby::it_session> Lobby::all_sessions()
+{
 	assert(m_list_session.size() > 0);
 	return { m_list_session.begin(), m_list_session.end() };
 }
-	
-Game& Lobby::start_game(const Session &) {
+
+Game& Lobby::start_game(const Session&)
+{
 	static auto t = 0;
 	++t;
 	if (t == 1)
-		throw LogicException{0x21, "DUMMY ERROR"};
+		throw LogicException{ 0x21, "DUMMY ERROR" };
 
-	static Game g{GameParameters{}, *this};
+	static Game g{ GameParameters{}, *this };
 	return g;
 }
 
-Game::Game(GameParameters const&, Lobby& l) : m_lobby{l}
-{}
-std::string const& Game::current_player() const {
-	static std::string p{"PLAYER"};
+Game::Game(GameParameters const&, Lobby& l) : m_lobby{ l }
+{
+}
+std::string const& Game::current_player() const
+{
+	static std::string p{ "PLAYER" };
 	return p;
 }
-uint16_t Game::troop_gained() {
+uint16_t Game::troop_gained()
+{
 	return 0;
 }
-
 
 lobby_id_t Lobby::id() const
 {
@@ -341,7 +348,7 @@ BOOST_AUTO_TEST_CASE(start_0x20_toobig, *boost::unit_test::timeout(1))
 	uint8_t code = 0x20;
 
 	std::vector<char> msg;
-	create_buf(msg, code, std::string{"padding"});
+	create_buf(msg, code, std::string{ "padding" });
 	boost::asio::const_buffer cbuf{ msg.data(), msg.size() };
 
 	wss_s->write(cbuf);

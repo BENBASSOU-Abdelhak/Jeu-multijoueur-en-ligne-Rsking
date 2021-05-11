@@ -3,47 +3,53 @@
 #include "logic/lobbypool.h"
 #include "network/lobbypooldispatcher.h"
 
+#include "network/session.h"
+#include "logicexception.h"
 
-void create_map() {
-    std::string const map_file("4");
-    std::ofstream fd_map(map_file.c_str());
-    if (!fd_map)    
-    {
-        std::cout << "ERREUR: Impossible de creer le fichier." << std::endl;
-        return;
-    }
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
-    fd_map << "carte de test" << std::endl;
-    fd_map << "9" << std::endl;
-    fd_map << "4" << std::endl;
-    fd_map << "2" << std::endl;
-    fd_map << "2" << std::endl;
-    fd_map << "1" << std::endl;
-    fd_map << "1" << std::endl;
-    fd_map << "0 2" << std::endl;
-    fd_map << "1 3" << std::endl;
-    fd_map << "4 6 5" << std::endl;
-    fd_map << "7 8" << std::endl;
-    fd_map << "region 0" << std::endl;
-    fd_map << "region 1" << std::endl;
-    fd_map << "region 2" << std::endl;
-    fd_map << "region 3" << std::endl;
-    fd_map << "0 1 1 1 0 0 0 0 0" << std::endl;
-    fd_map << "1 0 0 1 0 0 0 0 0" << std::endl;
-    fd_map << "1 0 0 1 1 0 1 0 0" << std::endl;
-    fd_map << "1 1 1 0 0 1 1 0 0" << std::endl;
-    fd_map << "0 0 1 0 0 0 1 1 0" << std::endl;
-    fd_map << "0 0 0 1 0 0 1 0 0" << std::endl;
-    fd_map << "0 0 1 1 1 1 0 1 0" << std::endl;
-    fd_map << "0 0 0 0 1 0 1 0 1" << std::endl;
-    fd_map << "0 0 0 0 0 0 0 1 0";
+void create_map()
+{
+	std::string const map_file("4");
+	std::ofstream fd_map(map_file.c_str());
+	if (!fd_map) {
+		std::cout << "ERREUR: Impossible de creer le fichier." << std::endl;
+		return;
+	}
 
-    return;
+	fd_map << "carte de test" << std::endl;
+	fd_map << "9" << std::endl;
+	fd_map << "4" << std::endl;
+	fd_map << "2" << std::endl;
+	fd_map << "2" << std::endl;
+	fd_map << "1" << std::endl;
+	fd_map << "1" << std::endl;
+	fd_map << "0 2" << std::endl;
+	fd_map << "1 3" << std::endl;
+	fd_map << "4 6 5" << std::endl;
+	fd_map << "7 8" << std::endl;
+	fd_map << "region 0" << std::endl;
+	fd_map << "region 1" << std::endl;
+	fd_map << "region 2" << std::endl;
+	fd_map << "region 3" << std::endl;
+	fd_map << "0 1 1 1 0 0 0 0 0" << std::endl;
+	fd_map << "1 0 0 1 0 0 0 0 0" << std::endl;
+	fd_map << "1 0 0 1 1 0 1 0 0" << std::endl;
+	fd_map << "1 1 1 0 0 1 1 0 0" << std::endl;
+	fd_map << "0 0 1 0 0 0 1 1 0" << std::endl;
+	fd_map << "0 0 0 1 0 0 1 0 0" << std::endl;
+	fd_map << "0 0 1 1 1 1 0 1 0" << std::endl;
+	fd_map << "0 0 0 0 1 0 1 0 1" << std::endl;
+	fd_map << "0 0 0 0 0 0 0 1 0";
+
+	return;
 }
 
-void remove_map() {
-    std::remove("4");
-    return;
+void remove_map()
+{
+	std::remove("4");
+	return;
 }
 
 boost::asio::io_context ctx{ 1 };

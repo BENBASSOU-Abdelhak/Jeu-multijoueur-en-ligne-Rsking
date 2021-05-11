@@ -2,21 +2,18 @@
 #define INCLUDE__LOGIC__LOBBY_H
 
 #include <string>
-#include <map>
 #include <vector>
-#include <cassert>
-#include <iostream>
-#include <algorithm>
-#include <exception>
-#include "logicexception.h"
-#include "network/session.h"
-#include "logic/game.h"
+#include <memory>
+
 #include "logic/gameparameters.h"
 
 using lobby_id_t = uint64_t;
 using sec_by_turn_t = uint16_t;
 using id_map_t = uint16_t;
 using nb_players_t = uint8_t;
+
+class Session;
+class Game;
 
 class Lobby
 {

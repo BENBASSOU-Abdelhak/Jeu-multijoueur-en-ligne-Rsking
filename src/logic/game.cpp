@@ -1,5 +1,9 @@
 #include "logic/game.h"
 #include "logic/lobby.h"
+#include "logicexception.h"
+
+#include <iterator>
+#include <algorithm>
 
 __attribute__((weak)) Game::Game(GameParameters const& params, Lobby& lobby)
 	: m_phase(Placement), m_i_current_player(0), m_lobby(lobby), m_waiting_transfer(false)

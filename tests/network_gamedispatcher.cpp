@@ -185,9 +185,9 @@ JWT_t JWT::decode(std::string const& jwt)
 	ret.name = jwt;
 	return ret;
 }
-bool DBMS::add_game (Game &)
+bool DBMS::add_game(Game&)
 {
-    return true;
+	return true;
 }
 
 struct Fixture {

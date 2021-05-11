@@ -1,4 +1,9 @@
 #include "logic/lobby.h"
+#include "logic/game.h"
+#include "logicexception.h"
+#include "network/session.h"
+
+#include <algorithm>
 
 __attribute__((weak)) Lobby::Lobby(lobby_id_t id, GameParameters const& params)
 	: m_id{ id }, m_parameters{ params }, m_remaining_place{ m_parameters.nb_players }, m_game{ nullptr }
