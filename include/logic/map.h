@@ -19,6 +19,7 @@ class Map {
         Map(uint16_t id_map, std::vector<std::string> players_tag);
         void add_troops(uint16_t dst_square, uint16_t nb_troops);
         void remove_troops(uint16_t square, uint16_t nb_troops);
+        void set_nb_troops(uint16_t square, uint16_t nb_troops);
         
         bool is_possible_transfer(std::string player_tag, uint16_t src_square, uint16_t dst_square) const;
         bool is_neighbor_square(uint16_t src_square, uint16_t dst_square) const;

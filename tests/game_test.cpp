@@ -98,6 +98,10 @@ void Game::maj_score_player(std::string player) {
 	get_player_by_tag(player).set_area_points(m_map.get_area_points_player(player));
 
 }
+
+void Map::set_nb_troops(uint16_t square, uint16_t nb_troops) {
+    m_info_square[square].nb_troops = nb_troops;
+}
 /******************************************************************************/
 
 
@@ -161,7 +165,6 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 
 	t_game.skip(*s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
-
 	BOOST_CHECK(t_game.current_phase() == 1);
 	BOOST_CHECK(t_game.nb_alive() == 3);
 	BOOST_CHECK(t_game.is_finished() == false);
@@ -209,7 +212,6 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 
 	t_game.skip(*s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
-
 	t_game.get_current_player().set_disconnect();
 	BOOST_CHECK(t_game.nb_alive() == 1);
 	BOOST_CHECK(t_game.is_finished());
@@ -242,7 +244,6 @@ BOOST_FIXTURE_TEST_CASE(troops_gained, CreateMap)
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
-
 	BOOST_CHECK(t_game.troop_gained() == 3);
 	t_game.set_current_player(1);
 	BOOST_CHECK(t_game.troop_gained() == 1);
@@ -319,6 +320,9 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
+	for (int i = 0; i <= 8; i++) {
+        t_game.get_map().set_nb_troops(i, 2);
+    }
 	t_game.get_player_by_tag("p1").set_remaining_deploy_troops(3);
 	t_game.get_player_by_tag("p2").set_remaining_deploy_troops(1);
 	t_game.get_player_by_tag("p3").set_remaining_deploy_troops(2);
@@ -453,6 +457,9 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap) {
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
+	for (int i = 0; i <= 8; i++) {
+        t_game.get_map().set_nb_troops(i, 2);
+    }
 	t_game.get_map().add_troops(0, 2);
 
 	/*** etat actuel ***/

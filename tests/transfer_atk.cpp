@@ -108,6 +108,10 @@ Player& Game::get_player_by_id(int i) {
     return m_players[i];
 }
 
+void Map::set_nb_troops(uint16_t square, uint16_t nb_troops) {
+    m_info_square[square].nb_troops = nb_troops;
+}
+
 atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
     uint16_t nb_troops, int d1, int d2, int d3, int d4, int d5)
 {
@@ -245,6 +249,9 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap) {
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
+    for (int i = 0; i <= 8; i++) {
+        t_game.get_map().set_nb_troops(i, 2);
+    }
 	t_game.maj_score_player("p1");
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
@@ -335,6 +342,9 @@ BOOST_FIXTURE_TEST_CASE(attack_loose_and_transfer, CreateMap) {
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
+    for (int i = 0; i <= 8; i++) {
+        t_game.get_map().set_nb_troops(i, 2);
+    }
 	t_game.maj_score_player("p1");
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
@@ -390,6 +400,9 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap) {
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
+    for (int i = 0; i <= 8; i++) {
+        t_game.get_map().set_nb_troops(i, 2);
+    }
 	t_game.maj_score_player("p1");
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
@@ -469,6 +482,9 @@ BOOST_FIXTURE_TEST_CASE(null_transfer, CreateMap) {
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
+    for (int i = 0; i <= 8; i++) {
+        t_game.get_map().set_nb_troops(i, 2);
+    }
 	t_game.maj_score_player("p1");
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
@@ -528,6 +544,9 @@ BOOST_FIXTURE_TEST_CASE(twice_transfer_atk, CreateMap) {
         t_game.set_square_owner_map(i, "p2");
 	for (int i = 6; i <= 8; i++)
         t_game.set_square_owner_map(i, "p3");
+    for (int i = 0; i <= 8; i++) {
+        t_game.get_map().set_nb_troops(i, 2);
+    }
 	t_game.maj_score_player("p1");
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");

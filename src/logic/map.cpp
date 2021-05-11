@@ -3,6 +3,11 @@
 #include <sstream>
 #include <fstream>
 
+#include <iostream>
+#include <vector>
+#include <random>
+#include <algorithm>
+#include <numeric>
 
 __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players_tag)
 {
@@ -30,6 +35,10 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
             throw std::logic_error("bad format file");
         m_area_values[i] = tmp_int;
     }
+
+    // matrice de stockages des territoires des regions
+    std::vector<std::vector<uint16_t>> square_areas;
+    square_areas.resize(nb_area, std::vector<uint16_t>(0));
     
     // recup id region des territoires
     std::vector<bool> check_square(nb_square, false);
@@ -46,6 +55,8 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
                 throw std::logic_error("bad format file");
             check_square[tmp_int] = true;
             m_info_square[tmp_int].id_region = i;
+            
+            square_areas[i].push_back(tmp_int);
         }
     }
     for (auto i : check_square)
@@ -74,15 +85,106 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
     if (fd_map >> tmp_char)
         throw std::logic_error("bad format file");
 
+    
+    /***************************** repartition des troupes et territoires *****/
 
-    for (int i = 0; i < nb_square; i++)
+    // melanges de l'orde des territoires des regions
+    auto engine = std::default_random_engine{}; 
+    for (int i = 0; i < nb_area; i++)
+        std::shuffle(std::begin(square_areas[i]), std::end(square_areas[i]), engine);
+
+    std::random_device rd; 
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib(1, 3);
+
+    const int nb_player = players_tag.size();
+    int nb_troop_max = ((int)(nb_square / nb_player)) * 2;
+
+    std::vector<std::vector<uint8_t>> troops_distribution;
+    troops_distribution.resize(nb_player, std::vector<uint8_t>((nb_square / nb_player) + 1));
+
+    // definition nb des territoires pour chaque joueur
+    for (int i = 0; i < nb_player; i++)
     {
-        m_info_square[i].nb_troops = 2;
-        m_info_square[i].player_tag = players_tag[i % players_tag.size()];
-	m_info_square[i].player_id = 1+ (i % players_tag.size());
+        if (i == (nb_player - 1))
+            troops_distribution[i].assign(nb_square - (((int)(nb_square / nb_player)) * i), 1);
+        else
+            troops_distribution[i].assign(nb_square / nb_player, 1);
+    }
+
+    // def du nb de troupe sur chaque territoire
+    for (int i = 0; i < nb_player; i++)
+    {
+        int j = 0;
+        int somme = std::accumulate(troops_distribution[i].begin(), troops_distribution[i].end(), 0);
+        while (somme != nb_troop_max && j < (int)troops_distribution[i].size()) 
+        {
+            troops_distribution[i][j] = distrib(gen);
+            somme = std::accumulate(troops_distribution[i].begin(), troops_distribution[i].end(), 0);
+            
+            if (somme > nb_troop_max) {
+                while (somme != nb_troop_max) {
+                    troops_distribution[i][j]--;
+                    somme = std::accumulate(troops_distribution[i].begin(), troops_distribution[i].end(), 0);
+                }
+                
+                somme = std::accumulate(troops_distribution[i].begin(), troops_distribution[i].end(), 0);
+            }
+            j++;
+        }
+
+        // si il n'y a pas assez de troupe
+        if (somme < nb_troop_max) {
+            j = 0;
+            while (somme != nb_troop_max && j < (int)troops_distribution[i].size()) 
+            {
+                if (troops_distribution[i][j] < 3)
+                    troops_distribution[i][j]++;
+                somme = std::accumulate(troops_distribution[i].begin(), troops_distribution[i].end(), 0);
+                // cas extreme
+                if (j == ((int)troops_distribution[i].size() - 1) && somme != nb_troop_max)
+                    troops_distribution[i][j] += nb_troop_max - somme;
+                
+                j++;
+            }
+        }
+    }
+
+    // attribution des troupes et territoires
+    int cpt2 = 0;
+    for (int i = 0; i < nb_area; i++)
+    {
+        for (int j = 0; j < (int)square_areas[i].size(); j++)
+        {
+            if (i == (nb_area-1) && (j == (int)square_areas[i].size()-1) && (nb_square % players_tag.size() != 0))
+            {
+                m_info_square[square_areas[i][j]].nb_troops 
+                    = troops_distribution[players_tag.size() - 1].back();
+                m_info_square[square_areas[i][j]].player_tag = players_tag[players_tag.size() - 1];
+                m_info_square[square_areas[i][j]].player_id = players_tag.size();
+            }    
+            else
+            {
+                m_info_square[square_areas[i][j]].nb_troops 
+                    = troops_distribution[cpt2 % players_tag.size()].back();
+                m_info_square[square_areas[i][j]].player_tag = players_tag[cpt2 % players_tag.size()];
+                m_info_square[square_areas[i][j]].player_id = 1+ (cpt2 % players_tag.size());
+            }
+            troops_distribution[cpt2 % players_tag.size()].pop_back();
+            cpt2++;
+        }
+    }
+
+    // verification de repartition des troupes
+    for (auto t : players_tag) {
+        if (get_nb_troops_player(t) < nb_troop_max) {
+            for (int i = 0; i < nb_square && get_nb_troops_player(t) < nb_troop_max; i++) {
+                if ((!get_square_owner(i).compare(t)) && get_nb_troops_square(i) < 3)
+                    add_troops(i, 1);
+            }
+        }
     }
 }
-
 
 __attribute__((weak)) Map::Map() {}
 
