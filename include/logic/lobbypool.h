@@ -30,7 +30,6 @@ class LobbyPool
 	LobbyPool(size_t max_lobbies);
 	size_t m_nb_lobby; // nb de lobbies actuel
 	size_t m_max_lobby;
-	std::mt19937 m_gen;
 	std::uniform_int_distribution<lobby_id_t> m_distrib;
 	std::map<lobby_id_t, Lobby> m_lobby_list;
 };

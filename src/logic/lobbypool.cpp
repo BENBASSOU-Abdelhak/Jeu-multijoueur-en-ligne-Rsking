@@ -1,9 +1,9 @@
 #include "logic/lobbypool.h"
 
+#include "generator.h"
+
 __attribute__((weak)) LobbyPool::LobbyPool(size_t max_lobbies) : m_nb_lobby{ 0 }, m_max_lobby{ max_lobbies }
 {
-	std::random_device rd;
-	std::mt19937 m_gen(rd());
 	std::uniform_int_distribution<lobby_id_t> m_distrib(0, std::numeric_limits<lobby_id_t>::max());
 }
 
@@ -29,7 +29,7 @@ __attribute__((weak)) Lobby& LobbyPool::create_lobby(Session& session, std::stri
 	if (m_nb_lobby == m_max_lobby)
 		throw LogicException(0x17, "Nombre maximum de salons atteint !");
 
-	lobby_id_t new_id = m_distrib(m_gen);
+	lobby_id_t new_id = m_distrib(Gen::get());
 	lobby_id_t new_id_deux = new_id;
 	m_lobby_list.emplace(std::make_pair<lobby_id_t, Lobby>(std::move(new_id_deux), Lobby{ new_id, params }));
 	m_lobby_list.at(new_id).join(session, gamertag);
