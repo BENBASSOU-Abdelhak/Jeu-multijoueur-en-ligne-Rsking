@@ -40,3 +40,9 @@ BOOST_AUTO_TEST_CASE(test_certificates)
 		BOOST_TEST(false);
 	}
 }
+
+BOOST_AUTO_TEST_CASE(conf_dir)
+{
+	SslContext::conf_dir("./");
+	BOOST_TEST(true);
+}

@@ -136,6 +136,8 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 	Game t_game(gp, l);
 	/*******************/
 
+	BOOST_TEST(t_game.time_left() > 0);
+
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
 	BOOST_CHECK(t_game.current_phase() == 1);
 	t_game.get_current_player().reset_rem_troops();
