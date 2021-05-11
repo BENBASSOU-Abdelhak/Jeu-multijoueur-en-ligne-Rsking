@@ -120,6 +120,11 @@ std::shared_ptr<Game> Lobby::get_started() const
 	return m_game;
 }
 
+bool Lobby::is_started() const {
+	return !((m_game.get() == nullptr) || m_game->is_finished());
+}
+
+
 __attribute__((weak)) GameParameters const& Lobby::parameters() const
 {
 	return m_parameters;
