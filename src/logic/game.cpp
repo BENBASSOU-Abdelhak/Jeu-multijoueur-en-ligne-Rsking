@@ -10,7 +10,6 @@ __attribute__((weak)) Game::Game(GameParameters const& params, Lobby& lobby)
 		tags.push_back(*(it));
 	}
 
-	Map map(params.id_map, tags);
 	m_map = Map(params.id_map, tags);
 
 	Dice_roll dr{};
