@@ -256,7 +256,7 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap) {
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
 
-	t_game.skip(*s1);
+	//t_game.skip(*s1);
 
 
     BOOST_TEST(t_game.get_current_player().get_square_from_last_atk() == 0);
@@ -345,7 +345,7 @@ BOOST_FIXTURE_TEST_CASE(attack_loose_and_transfer, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
 
 	struct atk_result ar;
 	ar = t_game.attack_test(*s1, 0, 3, 3, 5, 5, 5, 5, 5);
@@ -400,12 +400,12 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
     t_game.skip(*s1);
     t_game.skip(*s1);
     t_game.add_troops(*s2, 3, 1);
 
-    t_game.skip(*s2);
+    //t_game.skip(*s2);
     // pas son tour de skip
     try {
 		t_game.skip(*s1);
@@ -479,12 +479,12 @@ BOOST_FIXTURE_TEST_CASE(null_transfer, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
     t_game.skip(*s1);
     t_game.skip(*s1);
     t_game.add_troops(*s2, 3, 1);
     
-    t_game.skip(*s2);
+    //t_game.skip(*s2);
 
 	struct atk_result ar;
 	ar = t_game.attack_test(*s2, 3, 6, 2, 6, 6, 5, 5, 5);
@@ -538,12 +538,12 @@ BOOST_FIXTURE_TEST_CASE(twice_transfer_atk, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
     t_game.skip(*s1);
     t_game.skip(*s1);
     t_game.add_troops(*s2, 3, 1);
     
-    t_game.skip(*s2);
+    //t_game.skip(*s2);
 
 	struct atk_result ar;
 	ar = t_game.attack_test(*s2, 3, 6, 2, 6, 6, 5, 5, 5);

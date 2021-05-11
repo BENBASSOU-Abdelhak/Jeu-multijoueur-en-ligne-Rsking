@@ -53,9 +53,13 @@ __attribute__((weak)) void Game::add_troops(Session const& player_asking, uint16
 	if (nb_troops > get_current_player().get_remaining_deploy_troops())
 		throw LogicException{ 0x41, "Pas assez de troupes : Le joueur ne lui reste pas autant de troupes" };
 
-	get_current_player().set_remaining_deploy_troops(get_current_player().get_remaining_deploy_troops() -
-							 nb_troops);
+	auto left = get_current_player().get_remaining_deploy_troops() - nb_troops;
+
+	get_current_player().set_remaining_deploy_troops(left);
 	add_troops_map(dst_square, nb_troops);
+
+	if (left == 0)
+		skip(player_asking);
 }
 
 __attribute__((weak)) atk_result Game::attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
@@ -124,7 +128,7 @@ __attribute__((weak)) atk_result Game::attack(Session const& player_asking, uint
 			get_player_by_tag(beaten_player).set_disconnect();
 
 			result.defender_loose_game = true;
-            mark_player_as_eliminated(get_player_by_tag (beaten_player));
+			mark_player_as_eliminated(get_player_by_tag(beaten_player));
 		}
 
 		get_square_owner_map(dst_square).set_nb_square(get_square_owner_map(dst_square).get_nb_square() - 1);
@@ -242,7 +246,7 @@ void Game::player_quit(Session const& player_asking, std::string const& gamertag
 		throw LogicException{ 0x16, "Le joueur n'existe pas dans la game" };
 
 	get_player_by_tag(gamertag).set_disconnect();
-    mark_player_as_eliminated(get_player_by_tag (gamertag));
+	mark_player_as_eliminated(get_player_by_tag(gamertag));
 	// TODO prevenir que un joueur a quitté
 
 	if (get_current_player() == get_player_by_tag(gamertag)) {
@@ -340,7 +344,7 @@ __attribute__((weak)) size_t Game::nb_alive() const
 
 __attribute__((weak)) std::string const& Game::last_dead() const
 {
-	return m_eliminated_players.at (m_eliminated_players.size() - 1).get_tag();
+	return m_eliminated_players.at(m_eliminated_players.size() - 1).get_tag();
 }
 
 __attribute__((weak)) Lobby& Game::lobby() const
@@ -421,6 +425,7 @@ __attribute__((weak)) uint16_t Game::time_left() const
 	return 1;
 }
 
-void Game::mark_player_as_eliminated(Player& player) {
-    m_eliminated_players.push_back (player);
+void Game::mark_player_as_eliminated(Player& player)
+{
+	m_eliminated_players.push_back(player);
 }

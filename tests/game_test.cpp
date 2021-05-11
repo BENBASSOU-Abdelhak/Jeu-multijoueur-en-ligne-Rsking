@@ -375,7 +375,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 4);
 	t_game.add_troops(*s1, 0, 1);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 5);
-	t_game.skip(*s1);
+	//t_game.skip(*s1);
 
 	// le joeur reessaie de transferer des troupes dans une autre phase
 	try {
@@ -389,14 +389,14 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 2);
 	t_game.add_troops(*s2, 3, 1);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 3);
-	t_game.skip(*s2);
+	//t_game.skip(*s2);
 	t_game.skip(*s2);
 	t_game.skip(*s2);
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(6) == 2);
 	t_game.add_troops(*s3, 6, 2);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(6) == 4);
-	t_game.skip(*s3);
+	//t_game.skip(*s3);
 	t_game.skip(*s3);
 	try {
 		t_game.add_troops(*s3, 6, 1);

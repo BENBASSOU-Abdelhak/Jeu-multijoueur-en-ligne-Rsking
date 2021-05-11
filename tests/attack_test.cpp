@@ -248,7 +248,7 @@ BOOST_FIXTURE_TEST_CASE(before_attack, CreateMap) {
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());	
-	t_game.add_troops(*s1, 0, 3);
+	t_game.add_troops(*s1, 0, 3-1);
 	t_game.get_map().remove_troops(1, 1);
 	t_game.maj_score_player("p1");
 	
@@ -263,7 +263,9 @@ BOOST_FIXTURE_TEST_CASE(before_attack, CreateMap) {
 		BOOST_TEST(false);
 	} catch (LogicException const& e) { BOOST_TEST(true);};
 
-	t_game.skip(*s1);
+	//t_game.skip(*s1);
+	t_game.add_troops(*s1, 0, 1);
+
 
 	// nb de troupe superieur a 3
 	try {
@@ -346,7 +348,7 @@ BOOST_FIXTURE_TEST_CASE(attack_1, CreateMap) {
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
 
-	t_game.skip(*s1);
+	//t_game.skip(*s1);
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 5);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 2);
@@ -439,7 +441,7 @@ BOOST_FIXTURE_TEST_CASE(attack_2, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
 
 	struct atk_result ar;
 	ar = t_game.attack_test(*s1, 0, 3, 3, 5, 5, 5, 5, 5);
@@ -503,7 +505,7 @@ BOOST_FIXTURE_TEST_CASE(attack_3, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
 
 	struct atk_result ar;
 	ar = t_game.attack_test(*s1, 0, 3, 3, 6, 5, 5, 5, 5);
@@ -571,7 +573,7 @@ BOOST_FIXTURE_TEST_CASE(attack_4, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
 
 	struct atk_result ar;
 	ar = t_game.attack_test(*s1, 0, 3, 3, 6, 5, 5, 5, 5);
@@ -637,7 +639,7 @@ BOOST_FIXTURE_TEST_CASE(attack_5, CreateMap) {
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-    t_game.skip(*s1);
+    //t_game.skip(*s1);
 
     BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 5);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 2);
