@@ -7,6 +7,8 @@
 #include <array>
 #include <algorithm>
 
+#include "generator.h"
+
 #define NB_ATK_DICE 3
 #define NB_DF_DICE 2
 
@@ -17,7 +19,7 @@ class Dice_roll {
         
         void set_dice_values() {
             std::random_device rd; 
-            std::mt19937 gen(rd());
+            std::mt19937& gen = Gen::get();
             std::uniform_int_distribution<> distrib(1, 6);
 
             for (int i = 0; i < NB_ATK_DICE; i++)

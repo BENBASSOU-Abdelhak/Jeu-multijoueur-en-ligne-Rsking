@@ -8,6 +8,8 @@
 
 #include "configuration.h"
 
+#include "generator.h"
+
 #include <boost/log/trivial.hpp>
 #include <boost/asio/dispatch.hpp>
 
@@ -175,11 +177,8 @@ void Session::unserialize(size_t bytes_transferred)
 // lobby_id_t
 session_id_t gen_session_id()
 {
-	// TODO: génération globale et sécurisée.
-	static std::mt19937_64 gen{ static_cast<unsigned>(
-		std::chrono::system_clock::now().time_since_epoch().count()) };
 	static std::uniform_int_distribution<session_id_t> dis;
-	return dis(gen);
+	return dis(Gen::get());
 }
 
 bool operator==(Session const& lhs, Session const& rhs)

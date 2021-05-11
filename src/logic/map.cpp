@@ -3,6 +3,8 @@
 #include <sstream>
 #include <fstream>
 
+#include "generator.h"
+
 #include <iostream>
 #include <vector>
 #include <random>
@@ -89,12 +91,10 @@ __attribute__((weak)) Map::Map(uint16_t id_map, std::vector<std::string> players
     /***************************** repartition des troupes et territoires *****/
 
     // melanges de l'orde des territoires des regions
-    auto engine = std::default_random_engine{}; 
     for (int i = 0; i < nb_area; i++)
-        std::shuffle(std::begin(square_areas[i]), std::end(square_areas[i]), engine);
+        std::shuffle(std::begin(square_areas[i]), std::end(square_areas[i]), Gen::get());
 
-    std::random_device rd; 
-    std::mt19937 gen(rd());
+    std::mt19937& gen = Gen::get();
     std::uniform_int_distribution<> distrib(1, 3);
 
     const int nb_player = players_tag.size();
