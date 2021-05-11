@@ -4,6 +4,7 @@
 
 #include <iterator>
 #include <algorithm>
+#include <cassert>
 
 __attribute__((weak)) Game::Game(GameParameters const& params, Lobby& lobby)
 	: m_phase(Placement), m_i_current_player(0), m_lobby(lobby), m_waiting_transfer(false)
@@ -361,8 +362,7 @@ Player& Game::get_player_by_tag(std::string tag)
 		if (!m_players[i].get_tag().compare(tag))
 			return m_players[i];
 
-	std::fprintf(stderr, "joueur non trouvé par get_player_by_tag()\n");
-	exit(1);
+	assert(false && "joueur non trouvé par get_player_by_tag()\n");
 }
 
 uint8_t Game::player_id(Player& player) const
@@ -370,8 +370,7 @@ uint8_t Game::player_id(Player& player) const
 	for (uint8_t i = 0; i < m_players.size(); i++)
 		if (m_players[i] == player)
 			return i;
-	std::fprintf(stderr, "joueur non trouvé par player_id()\n");
-	exit(1);
+	assert(false && "joueur non trouvé par player_id()\n");
 }
 
 uint8_t Game::player_id(std::string const& player) const
@@ -379,8 +378,7 @@ uint8_t Game::player_id(std::string const& player) const
 	for (uint8_t i = 0; i < m_players.size(); i++)
 		if (m_players[i] == player)
 			return i;
-	std::fprintf(stderr, "joueur non trouvé par player_id()\n");
-	exit(1);
+	assert(false && "joueur non trouvé par player_id()\n");
 }
 
 void Game::transfer_after_attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square,

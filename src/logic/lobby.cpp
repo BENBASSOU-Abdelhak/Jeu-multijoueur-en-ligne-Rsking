@@ -121,7 +121,7 @@ std::shared_ptr<Game> Lobby::get_started() const
 }
 
 bool Lobby::is_started() const {
-	return !((m_game.get() == nullptr) || m_game->is_finished());
+	return !((get_started() == nullptr) || m_game->is_finished());
 }
 
 
