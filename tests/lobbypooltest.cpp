@@ -83,16 +83,25 @@ BOOST_FIXTURE_TEST_CASE(test_constructeur_nb_lobby_et_get, CreateMap)
 	BOOST_TEST(lp.get_nb_lobby() == 0);
 }
 
+BOOST_FIXTURE_TEST_CASE(no_dispo_lobby_no_player_in_lobby, CreateMap)
+{
+	LobbyPool& lp = LobbyPool::get();
+	Lobby& id = lp.create_lobby(*s1, "Hicheme", param_lobby_one);
+	lp.getLobby(id.id()).exit("Hicheme");
+	lobby_id_t lobby_id = lp.lobby_dispo(*s2, "Matheo");
+	BOOST_TEST(lobby_id == 0);
+}
+
+
 BOOST_FIXTURE_TEST_CASE(no_dispo_lobby_no_place, CreateMap)
 {
 	LobbyPool& lp = LobbyPool::get();
 	Lobby& id = lp.create_lobby(*s1, "Hicheme", param_lobby_one);
 	lp.join_lobby(id.id(), *s2, "Leo");
 	lp.join_lobby(id.id(), *s3, "Karim");
-	lobby_id_t lobby_id = lp.lobby_dispo(*s1, "Matheo");
+	lobby_id_t lobby_id = lp.lobby_dispo(*s4, "Matheo");
 	BOOST_TEST(lobby_id == 0);
 }
-
 
 BOOST_FIXTURE_TEST_CASE(no_dispo_lobby_game_started, CreateMap)
 {
@@ -100,7 +109,7 @@ BOOST_FIXTURE_TEST_CASE(no_dispo_lobby_game_started, CreateMap)
 	Lobby& id = lp.create_lobby(*s1, "Hicheme", param_lobby_one);
 	lp.join_lobby(id.id(), *s2, "Leo");
 	lp.getLobby(id.id()).start_game(*s1);
-	lobby_id_t lobby_id = lp.lobby_dispo(*s1, "Matheo");
+	lobby_id_t lobby_id = lp.lobby_dispo(*s3, "Matheo");
 	BOOST_TEST(lobby_id == 0);
 }
 
@@ -270,5 +279,3 @@ BOOST_FIXTURE_TEST_CASE(test_create_lobby_not_right_max_lobby_atteint, CreateMap
 			BOOST_TEST(false);
 	}
 }
-
-

@@ -89,7 +89,7 @@ __attribute__((weak)) lobby_id_t LobbyPool::lobby_dispo(Session&, std::string co
 	for (auto & lobby : m_lobby_list) {
 	//lobby est un Lobby
 		//Si il reste de la place, que la game et pas start et que le joueur a pas été ban de ce salon ok
-		if(lobby.second.get_remaining_place() > 0 && !lobby.second.is_started() && lobby.second.verification_join(gamertag) == false)
+		if(lobby.second.get_remaining_place() > 0 && !lobby.second.is_started() && lobby.second.verification_join(gamertag) == false && lobby.second.get_remaining_place() != lobby.second.get_nb_player() )
 		{
 			return lobby.second.id();
 		} 
