@@ -15,6 +15,7 @@
 
 #include <random>
 #include <chrono>
+#include <mutex>
 
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http; // from <boost/beast/http.hpp>
@@ -23,6 +24,8 @@ namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
 session_id_t gen_session_id();
+
+std::mutex mut;
 
 /* Aide :
  *
@@ -101,7 +104,7 @@ void Session::send(std::vector<char> const& data)
 	// that the members of `this` will not be
 	// accessed concurrently.
 	auto pt = std::make_shared<std::remove_const_t<std::remove_reference_t<decltype(data)>>>(data);
-	net::post(wss_.get_executor(), beast::bind_front_handler(&Session::on_send, shared_from_this(), std::move(pt)));
+	net::post(wss_.get_executor(), beast::bind_front_handler(&Session::on_send, shared_from_this(), pt));
 }
 
 void Session::on_send(std::shared_ptr<std::vector<char>> const& buf)
@@ -146,14 +149,16 @@ void Session::on_write(beast::error_code ec, std::size_t bytes_transferred)
 	if (ec)
 		return fail(ec, "session write");
 
+	const std::lock_guard<std::mutex> lock(mut);
 	// Remove the string from the queue
 	queue_.erase(queue_.begin());
 	BOOST_LOG_TRIVIAL(debug) << "sent " << bytes_transferred << "bytes";
 
 	// Send the next message if any
-	if (!queue_.empty())
+	if (!queue_.empty()) //TODO: ici pas thread-safe
 		wss_.async_write(net::buffer(*queue_.front()),
 				 beast::bind_front_handler(&Session::on_write, shared_from_this()));
+	//mutex released here
 }
 
 void Session::change_dispatcher(std::unique_ptr<Dispatcher>&& dispatcher)
