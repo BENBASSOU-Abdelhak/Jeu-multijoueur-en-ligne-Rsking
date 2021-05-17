@@ -28,7 +28,7 @@ Lobby const& LobbyPool::getLobby(lobby_id_t id) const
 	return m_lobby_list.at(id);
 }
 
-__attribute__((weak)) Lobby& LobbyPool::create_lobby(Session& session, std::string const& gamertag,
+__attribute__((weak)) Lobby& LobbyPool::create_lobby(std::shared_ptr<Session> session, std::string const& gamertag,
 						     GameParameters const& params)
 {
 	if (m_nb_lobby == m_max_lobby)
@@ -43,7 +43,7 @@ __attribute__((weak)) Lobby& LobbyPool::create_lobby(Session& session, std::stri
 	return m_lobby_list.at(new_id);
 }
 
-__attribute__((weak)) Lobby& LobbyPool::join_lobby(lobby_id_t lobby_id, Session& session, std::string const& gamertag)
+__attribute__((weak)) Lobby& LobbyPool::join_lobby(lobby_id_t lobby_id, std::shared_ptr<Session> session, std::string const& gamertag)
 {
 	auto itr = m_lobby_list.find(lobby_id);
 	if (itr == m_lobby_list.end())
@@ -83,7 +83,7 @@ size_t LobbyPool::get_max_lobby() const
 	return m_max_lobby;
 }
 
-__attribute__((weak)) lobby_id_t LobbyPool::lobby_dispo(Session&, std::string const& gamertag)
+__attribute__((weak)) lobby_id_t LobbyPool::lobby_dispo(std::shared_ptr<Session>, std::string const& gamertag)
 {
 	//Parcourir les lobby 1 par 1
 	for (auto & lobby : m_lobby_list) {

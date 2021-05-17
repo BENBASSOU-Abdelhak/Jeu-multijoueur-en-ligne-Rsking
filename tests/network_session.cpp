@@ -33,7 +33,7 @@ constexpr unsigned short PORT = 42424;
 class Mock_dispatcher : public Dispatcher
 {
     public:
-	size_t dispatch(uint8_t code, Session& session, boost::asio::const_buffer const& buf,
+	size_t dispatch(uint8_t code, std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
 			size_t bytes_transferred) override
 	{
 		uint16_t c = code;
@@ -56,13 +56,13 @@ uint8_t Mock_dispatcher::code_ = 0;
 size_t Mock_dispatcher::bytes_transferred_ = 0;
 
 // override
-size_t LobbyPoolDispatcher::dispatch(uint8_t code, Session& session, boost::asio::const_buffer const& buf,
+size_t LobbyPoolDispatcher::dispatch(uint8_t code, std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
 				     size_t bytes_transferred)
 {
 	uint16_t c = code;
 	BOOST_LOG_TRIVIAL(debug)
 		<< "received message of " << bytes_transferred << "bytes with code 0x" << std::hex << c;
-	session.change_dispatcher(std::make_unique<Mock_dispatcher>());
+	session->change_dispatcher(std::make_unique<Mock_dispatcher>());
 	boost::ignore_unused(buf);
 	return bytes_transferred;
 }

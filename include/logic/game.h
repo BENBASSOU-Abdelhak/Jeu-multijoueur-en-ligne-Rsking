@@ -1,6 +1,8 @@
 #ifndef INCLUDE__LOGIC__GAME_H
 #define INCLUDE__LOGIC__GAME_H
 
+#include <memory>
+
 #include "logic/atk_result.h"
 #include "logic/map.h"
 #include "logic/dice_roll.h"
@@ -18,15 +20,15 @@ class Game
 {
     public:
 	Game(GameParameters const& params, Lobby& lobby);
-	void add_troops(Session const& player_asking, uint16_t dst_square, uint16_t nb_troops);
-	atk_result attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops);
-	void transfer(Session const& player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops);
-	void transfer_after_attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
+	void add_troops(std::shared_ptr<Session> player_asking, uint16_t dst_square, uint16_t nb_troops);
+	atk_result attack(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops);
+	void transfer(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops);
+	void transfer_after_attack(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square,
 				   uint16_t nb_troops);
 
-	void skip(Session const& player_asking);
+	void skip(std::shared_ptr<Session> player_asking);
 	//quitté la partie, ban ou perdu
-	void player_quit(Session const& player_asking, std::string const& gamertag);
+	void player_quit(std::shared_ptr<Session> player_asking, std::string const& gamertag);
 	bool is_finished() const;
 
 	Player& get_current_player();
@@ -59,7 +61,7 @@ class Game
 	void set_current_player(uint16_t i);
 	void set_square_owner_map(uint16_t square, std::string new_owner);
 	void maj_score_player(std::string player);
-	atk_result attack_test(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
+	atk_result attack_test(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square,
 			       uint16_t nb_troops, int d1, int d2, int d3, int d4, int d5);
 	Player& get_player_by_id(int i);
 

@@ -107,9 +107,9 @@ BOOST_FIXTURE_TEST_CASE(get_player_id, CreateMap)
 	gp.nb_players = 3;
 
 	Lobby l(0, gp);
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 
 	BOOST_TEST(t_game.player_id(t_game.get_current_player()) == 0);

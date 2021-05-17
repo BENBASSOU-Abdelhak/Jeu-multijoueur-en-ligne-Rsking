@@ -130,27 +130,29 @@ void create_buf(Stream& sbuf, GameParameters const& gp)
 
 // Envoi un message
 template <typename T, typename... Args>
-void send_message(Session& session, T&& param, Args&&... params)
+void send_message(std::shared_ptr<Session> session, T&& param, Args&&... params)
 {
 	std::vector<char> buf;
 	create_buf(buf, std::forward<T&&>(param), std::forward<Args&&>(params)...);
-	session.send(buf);
+	session->send(buf);
 }
 
 // Envoi une erreur
-inline void send_error(Session& session, uint8_t subcode, std::string const& message)
+inline void send_error(std::shared_ptr<Session> session, uint8_t subcode, std::string const& message)
 {
 	send_message(session, static_cast<uint8_t>(0), subcode, message);
 }
 
-struct Lobby;
 template <typename T, typename... Args>
 void broadcast(Lobby const& lobby, T&& param, Args&&... params)
 {
 	std::vector<char> buf;
 	create_buf(buf, std::forward<T&&>(param), std::forward<Args&&>(params)...);
 	for (auto session : lobby.m_list_session) {
-		session.get().send(buf);
+		std::shared_ptr<Session> sp;
+		if ((sp = session.lock())) {
+			sp->send(buf);
+		}
 	}
 }
 

@@ -15,7 +15,7 @@ GameDispatcher::GameDispatcher(Game& game) : game_(game)
 {
 }
 
-size_t GameDispatcher::dispatch(uint8_t code, Session& session, boost::asio::const_buffer const& buf,
+size_t GameDispatcher::dispatch(uint8_t code, std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
 				size_t bytes_transferred)
 {
 	switch (code) {
@@ -39,7 +39,8 @@ size_t GameDispatcher::dispatch(uint8_t code, Session& session, boost::asio::con
 	}
 }
 
-size_t GameDispatcher::place_troops(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
+size_t GameDispatcher::place_troops(std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
+				    size_t bytes_transferred)
 {
 	if (bytes_transferred < 2 * sizeof(uint16_t)) {
 		BOOST_LOG_TRIVIAL(warning) << "Message with code 0x40 should contain 2 uint16_t";
@@ -69,7 +70,8 @@ size_t GameDispatcher::place_troops(Session& session, boost::asio::const_buffer 
 	return read;
 }
 
-size_t GameDispatcher::attack(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
+size_t GameDispatcher::attack(std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
+			      size_t bytes_transferred)
 {
 	if (bytes_transferred < 3 * sizeof(uint16_t)) {
 		BOOST_LOG_TRIVIAL(warning) << "Message with code 0x50 should contain 3 uint16_t";
@@ -102,9 +104,15 @@ size_t GameDispatcher::attack(Session& session, boost::asio::const_buffer const&
 				}
 
 				auto all_sessions = game_.lobby().all_sessions();
-				std::for_each(all_sessions.first, all_sessions.second, [&](Session& session) {
-					session.change_dispatcher(std::make_unique<LobbyDispatcher>(game_.lobby()));
+				std::for_each(all_sessions.first, all_sessions.second, [&](auto const& wsession) {
+					auto sp = wsession.lock();
+					if (sp) {
+						sp->change_dispatcher(std::make_unique<LobbyDispatcher>(game_.lobby()));
+					} else {
+						BOOST_LOG_TRIVIAL(warning) << "Dead session detected";
+					}
 				});
+				return read;
 			}
 		}
 
@@ -122,7 +130,8 @@ size_t GameDispatcher::attack(Session& session, boost::asio::const_buffer const&
 	return read;
 }
 
-size_t GameDispatcher::transfer(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
+size_t GameDispatcher::transfer(std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
+				size_t bytes_transferred)
 {
 	if (bytes_transferred < 3 * sizeof(uint16_t)) {
 		BOOST_LOG_TRIVIAL(warning) << "Message with code 0x60 should contain 3 uint16_t";
@@ -140,8 +149,13 @@ size_t GameDispatcher::transfer(Session& session, boost::asio::const_buffer cons
 		broadcast(game_.lobby(), static_cast<uint8_t>(0x61), src, dst, nbt);
 
 		if (cp != game_.current_phase()) { // toutes les troupes placées
-			broadcast(game_.lobby(), static_cast<uint8_t>(0x71),
-				  static_cast<uint8_t>(game_.current_phase()), game_.time_left());
+			if (Gamephase::Placement == game_.current_phase()) {
+				broadcast(game_.lobby(), static_cast<uint8_t>(0x30), game_.current_player(),
+					  game_.troop_gained());
+			} else {
+				broadcast(game_.lobby(), static_cast<uint8_t>(0x71),
+					  static_cast<uint8_t>(game_.current_phase()), game_.time_left());
+			}
 		}
 	} catch (LogicException const& e) {
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in Game::transfer";
@@ -153,7 +167,8 @@ size_t GameDispatcher::transfer(Session& session, boost::asio::const_buffer cons
 	return read;
 }
 
-size_t GameDispatcher::next_phase(Session& session, boost::asio::const_buffer const&, size_t bytes_transferred)
+size_t GameDispatcher::next_phase(std::shared_ptr<Session> session, boost::asio::const_buffer const&,
+				  size_t bytes_transferred)
 {
 	if (bytes_transferred > 0) {
 		BOOST_LOG_TRIVIAL(warning) << "Message with code 0x70 should be empty";

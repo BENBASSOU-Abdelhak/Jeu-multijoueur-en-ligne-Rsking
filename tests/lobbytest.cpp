@@ -103,7 +103,7 @@ BOOST_FIXTURE_TEST_CASE(test_constructeur_sec_by_turn, CreateMap)
 BOOST_FIXTURE_TEST_CASE(test_return_list_player, CreateMap)
 {
 	Lobby lobby{ 5, param_lobby_one };
-	lobby.join(*s1, "Hicheme");
+	lobby.join(s1, "Hicheme");
 	auto r = lobby.all_players();
 	BOOST_TEST(*(r.first) == "Hicheme");
 }
@@ -111,19 +111,19 @@ BOOST_FIXTURE_TEST_CASE(test_return_list_player, CreateMap)
 BOOST_FIXTURE_TEST_CASE(test_return_list_sessions, CreateMap)
 {
 	Lobby lobby{ 5, param_lobby_one };
-	lobby.join(*s1, "Hicheme");
-	lobby.join(*s2, "Leo");
+	lobby.join(s1, "Hicheme");
+	lobby.join(s2, "Leo");
 	auto r = lobby.all_sessions();
-	BOOST_ASSERT(*r.first == *s1);
-	BOOST_ASSERT(*(++r.first) == *s2);
+	BOOST_ASSERT(*(r.first->lock()) == *s1);
+	BOOST_ASSERT(*(++r.first)->lock() == *s2);
 }
 
 BOOST_FIXTURE_TEST_CASE(test_ban_player_not_exist, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.ban(*s1, "Matheo");
+		lobby.join(s1, "Hicheme");
+		lobby.ban(s1, "Matheo");
 		BOOST_TEST(false);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x16)
@@ -135,9 +135,9 @@ BOOST_FIXTURE_TEST_CASE(test_ban_player_no_right_ban, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Matheo");
-		lobby.ban(*s2, "Hicheme");
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Matheo");
+		lobby.ban(s2, "Hicheme");
 		BOOST_TEST(false);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x15)
@@ -149,9 +149,9 @@ BOOST_FIXTURE_TEST_CASE(test_ban_player_ok, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Matheo");
-		lobby.ban(*s1, "Matheo");
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Matheo");
+		lobby.ban(s1, "Matheo");
 		BOOST_TEST(true);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x16)
@@ -163,7 +163,7 @@ BOOST_FIXTURE_TEST_CASE(test_ban_player_not_exist_in_game, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
+		lobby.join(s1, "Hicheme");
 		lobby.ban_in_game("Matheo");
 		BOOST_TEST(false);
 	} catch (const LogicException& e) {
@@ -176,8 +176,8 @@ BOOST_FIXTURE_TEST_CASE(test_ban_player_in_game_ok, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Matheo");
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Matheo");
 		lobby.ban_in_game("Matheo");
 		BOOST_TEST(true);
 	} catch (const LogicException& e) {
@@ -190,7 +190,7 @@ BOOST_FIXTURE_TEST_CASE(test_exit_player_dont_exist, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
+		lobby.join(s1, "Hicheme");
 		lobby.exit("Matheo");
 		BOOST_TEST(false);
 	} catch (const LogicException& e) {
@@ -203,8 +203,8 @@ BOOST_FIXTURE_TEST_CASE(test_exit_player_ok, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Matheo");
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Matheo");
 		lobby.exit("Matheo");
 		BOOST_TEST(true);
 	} catch (const LogicException& e) {
@@ -217,10 +217,10 @@ BOOST_FIXTURE_TEST_CASE(test_join_lobby_full, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Leo");
-		lobby.join(*s3, "Matheo");
-		lobby.join(*s4, "Karim");
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Leo");
+		lobby.join(s3, "Matheo");
+		lobby.join(s4, "Karim");
 		BOOST_TEST(false);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x12)
@@ -232,9 +232,9 @@ BOOST_FIXTURE_TEST_CASE(test_join_ok, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Leo");
-		lobby.join(*s3, "Matheo");
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Leo");
+		lobby.join(s3, "Matheo");
 		BOOST_TEST(true);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x12)
@@ -246,8 +246,8 @@ BOOST_FIXTURE_TEST_CASE(test_start_game_not_enough_player, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.start_game(*s1);
+		lobby.join(s1, "Hicheme");
+		lobby.start_game(s1);
 		BOOST_TEST(false);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x20)
@@ -259,9 +259,9 @@ BOOST_FIXTURE_TEST_CASE(test_start_game_not_right, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Leo");
-		lobby.start_game(*s2);
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Leo");
+		lobby.start_game(s2);
 		BOOST_TEST(false);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x21)
@@ -273,9 +273,9 @@ BOOST_FIXTURE_TEST_CASE(test_start_game_ok, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.join(*s2, "Leo");
-		lobby.start_game(*s1);
+		lobby.join(s1, "Hicheme");
+		lobby.join(s2, "Leo");
+		lobby.start_game(s1);
 		BOOST_TEST(true);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x20)
@@ -287,8 +287,8 @@ BOOST_FIXTURE_TEST_CASE(test_get_gamertag_error, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.get_gamertag(*s2);
+		lobby.join(s1, "Hicheme");
+		lobby.get_gamertag(s2);
 		BOOST_TEST(false);
 	}
 
@@ -302,8 +302,8 @@ BOOST_FIXTURE_TEST_CASE(test_get_gamertag_ok, CreateMap)
 {
 	try {
 		Lobby lobby{ 5, param_lobby_one };
-		lobby.join(*s1, "Hicheme");
-		lobby.get_gamertag(*s1);
+		lobby.join(s1, "Hicheme");
+		lobby.get_gamertag(s1);
 		BOOST_TEST(true);
 	} catch (const LogicException& e) {
 		if (e.subcode() != 0x16)

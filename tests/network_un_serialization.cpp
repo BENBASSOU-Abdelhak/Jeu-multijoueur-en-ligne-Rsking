@@ -37,7 +37,7 @@ Mocks* cur_mock = nullptr;
 boost::interprocess::interprocess_semaphore* cur_sem = nullptr;
 
 // override
-size_t LobbyPoolDispatcher::dispatch(uint8_t code, Session&, boost::asio::const_buffer const& buf,
+size_t LobbyPoolDispatcher::dispatch(uint8_t code, std::shared_ptr<Session>, boost::asio::const_buffer const& buf,
 				     size_t bytes_transferred)
 {
 	BOOST_LOG_TRIVIAL(debug) << "Entering mock";

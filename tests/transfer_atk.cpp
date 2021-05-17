@@ -1,6 +1,6 @@
 /**
  * @brief fichier de test du bon fonctionnement de Game::attack() (tests realisé avec 
- *	Game::attack_test(*s1, ) pour pallier au pb de generation aleatoires des valeurs
+ *	Game::attack_test(s1, ) pour pallier au pb de generation aleatoires des valeurs
  * 	de lancé de dé)
  */
 
@@ -124,7 +124,7 @@ void Map::set_nb_troops(uint16_t square, uint16_t nb_troops)
 	m_info_square[square].nb_troops = nb_troops;
 }
 
-atk_result Game::attack_test(Session const& player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops,
+atk_result Game::attack_test(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square, uint16_t nb_troops,
 			     int d1, int d2, int d3, int d4, int d5)
 {
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
@@ -235,9 +235,9 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -256,45 +256,45 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap)
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
-	t_game.add_troops(*s1, 0, 3);
+	t_game.add_troops(s1, 0, 3);
 
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-	//t_game.skip(*s1);
+	//t_game.skip(s1);
 
 	BOOST_TEST(t_game.get_current_player().get_square_from_last_atk() == 0);
 	BOOST_TEST(t_game.get_current_player().get_last_atk_square() == 0);
 
 	struct atk_result ar;
-	ar = t_game.attack_test(*s1, 0, 3, 3, 6, 6, 6, 5, 5);
+	ar = t_game.attack_test(s1, 0, 3, 3, 6, 6, 6, 5, 5);
 
 	BOOST_TEST(t_game.get_current_player().get_square_from_last_atk() == 0);
 	BOOST_TEST(t_game.get_current_player().get_last_atk_square() == 3);
 
 	try {
-		t_game.transfer(*s1, 0, 4, 3);
+		t_game.transfer(s1, 0, 4, 3);
 		BOOST_TEST(false);
 	} catch (std::exception const& e) {
 		BOOST_TEST(true);
 	}
 
 	try {
-		t_game.transfer(*s1, 1, 3, 3);
+		t_game.transfer(s1, 1, 3, 3);
 		BOOST_TEST(false);
 	} catch (std::exception const& e) {
 		BOOST_TEST(true);
 	}
 
 	try {
-		t_game.transfer(*s1, 0, 3, 4);
+		t_game.transfer(s1, 0, 3, 4);
 		BOOST_TEST(false);
 	} catch (std::exception const& e) {
 		BOOST_TEST(true);
 	}
 
-	t_game.transfer(*s1, 0, 3, 2);
+	t_game.transfer(s1, 0, 3, 2);
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 2);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 3);
@@ -311,7 +311,7 @@ BOOST_FIXTURE_TEST_CASE(attack_win_and_transfer, CreateMap)
 
 	// tentative de deuxieme transfer
 	try {
-		t_game.transfer(*s1, 0, 3, 1);
+		t_game.transfer(s1, 0, 3, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -329,9 +329,9 @@ BOOST_FIXTURE_TEST_CASE(attack_loose_and_transfer, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -350,20 +350,20 @@ BOOST_FIXTURE_TEST_CASE(attack_loose_and_transfer, CreateMap)
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
-	t_game.add_troops(*s1, 0, 3);
+	t_game.add_troops(s1, 0, 3);
 
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-	//t_game.skip(*s1);
+	//t_game.skip(s1);
 
 	struct atk_result ar;
-	ar = t_game.attack_test(*s1, 0, 3, 3, 5, 5, 5, 5, 5);
+	ar = t_game.attack_test(s1, 0, 3, 3, 5, 5, 5, 5, 5);
 
 	// transfert de troupe apres une defaite
 	try {
-		t_game.transfer(*s1, 0, 3, 1);
+		t_game.transfer(s1, 0, 3, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -371,7 +371,7 @@ BOOST_FIXTURE_TEST_CASE(attack_loose_and_transfer, CreateMap)
 
 	// transfert de troupe apres une troupe
 	try {
-		t_game.transfer(*s1, 0, 4, 1);
+		t_game.transfer(s1, 0, 4, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -389,9 +389,9 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -410,33 +410,33 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap)
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
-	t_game.add_troops(*s1, 0, 3);
+	t_game.add_troops(s1, 0, 3);
 
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-	//t_game.skip(*s1);
-	t_game.skip(*s1);
-	t_game.skip(*s1);
-	t_game.add_troops(*s2, 3, 1);
+	//t_game.skip(s1);
+	t_game.skip(s1);
+	t_game.skip(s1);
+	t_game.add_troops(s2, 3, 1);
 
-	//t_game.skip(*s2);
+	//t_game.skip(s2);
 	// pas son tour de skip
 	try {
-		t_game.skip(*s1);
+		t_game.skip(s1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	}
 
 	struct atk_result ar;
-	ar = t_game.attack_test(*s2, 3, 6, 2, 6, 6, 5, 5, 5);
+	ar = t_game.attack_test(s2, 3, 6, 2, 6, 6, 5, 5, 5);
 	BOOST_TEST(ar.square_conquered == true);
 
 	// transfert vers un autre territoire
 	try {
-		t_game.transfer(*s2, 3, 5, 1);
+		t_game.transfer(s2, 3, 5, 1);
 		BOOST_TEST(false);
 	} catch (std::exception const& e) {
 		BOOST_TEST(true);
@@ -444,7 +444,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap)
 
 	// transfert de de la totalite des troupes
 	try {
-		t_game.transfer(*s2, 3, 6, 2);
+		t_game.transfer(s2, 3, 6, 2);
 		BOOST_TEST(false);
 	} catch (std::exception const& e) {
 		BOOST_TEST(true);
@@ -455,14 +455,14 @@ BOOST_FIXTURE_TEST_CASE(transfer_after_skip, CreateMap)
 
 	// plus de joueur
 	try {
-		t_game.transfer(*s2, 3, 6, 1);
+		t_game.transfer(s2, 3, 6, 1);
 		BOOST_TEST(false);
 	} catch (std::exception const& e) {
 		BOOST_TEST(true);
 	}
 
 	t_game.get_player_by_tag("p1").set_connected();
-	t_game.transfer(*s2, 3, 6, 1);
+	t_game.transfer(s2, 3, 6, 1);
 }
 
 /**
@@ -475,9 +475,9 @@ BOOST_FIXTURE_TEST_CASE(null_transfer, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -496,27 +496,27 @@ BOOST_FIXTURE_TEST_CASE(null_transfer, CreateMap)
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
-	t_game.add_troops(*s1, 0, 3);
+	t_game.add_troops(s1, 0, 3);
 
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-	//t_game.skip(*s1);
-	t_game.skip(*s1);
-	t_game.skip(*s1);
-	t_game.add_troops(*s2, 3, 1);
+	//t_game.skip(s1);
+	t_game.skip(s1);
+	t_game.skip(s1);
+	t_game.add_troops(s2, 3, 1);
 
-	//t_game.skip(*s2);
+	//t_game.skip(s2);
 
 	struct atk_result ar;
-	ar = t_game.attack_test(*s2, 3, 6, 2, 6, 6, 5, 5, 5);
+	ar = t_game.attack_test(s2, 3, 6, 2, 6, 6, 5, 5, 5);
 	BOOST_TEST(ar.square_conquered == true);
-	t_game.transfer(*s2, 3, 6, 0);
+	t_game.transfer(s2, 3, 6, 0);
 
 	//transfer after atk deja effectué
 	try {
-		t_game.transfer(*s2, 3, 6, 0);
+		t_game.transfer(s2, 3, 6, 0);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		if (e.subcode() == 0x30)
@@ -536,9 +536,9 @@ BOOST_FIXTURE_TEST_CASE(twice_transfer_atk, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -557,28 +557,28 @@ BOOST_FIXTURE_TEST_CASE(twice_transfer_atk, CreateMap)
 	t_game.maj_score_player("p2");
 	t_game.maj_score_player("p3");
 	t_game.get_current_player().set_remaining_deploy_troops(t_game.troop_gained());
-	t_game.add_troops(*s1, 0, 3);
+	t_game.add_troops(s1, 0, 3);
 
 	/*** etat actuel ***/
 	// p1 : territoire 0 à 2; p1 : territoire 3 à 5; p3 : territoire 6 à 8
 	// territoire 0 contient 5 troupes et tous les autres 2 troupes
 
-	//t_game.skip(*s1);
-	t_game.skip(*s1);
-	t_game.skip(*s1);
-	t_game.add_troops(*s2, 3, 1);
+	//t_game.skip(s1);
+	t_game.skip(s1);
+	t_game.skip(s1);
+	t_game.add_troops(s2, 3, 1);
 
-	//t_game.skip(*s2);
+	//t_game.skip(s2);
 
 	struct atk_result ar;
-	ar = t_game.attack_test(*s2, 3, 6, 2, 6, 6, 5, 5, 5);
+	ar = t_game.attack_test(s2, 3, 6, 2, 6, 6, 5, 5, 5);
 	BOOST_TEST(ar.square_conquered == true);
-	t_game.transfer(*s2, 3, 6, 0);
+	t_game.transfer(s2, 3, 6, 0);
 
-	ar = t_game.attack_test(*s2, 4, 7, 1, 6, 6, 5, 5, 5);
+	ar = t_game.attack_test(s2, 4, 7, 1, 6, 6, 5, 5, 5);
 	BOOST_TEST(ar.square_conquered == false);
-	ar = t_game.attack_test(*s2, 4, 7, 1, 6, 6, 5, 5, 5);
+	ar = t_game.attack_test(s2, 4, 7, 1, 6, 6, 5, 5, 5);
 	BOOST_TEST(ar.square_conquered == true);
 
-	t_game.transfer(*s2, 4, 7, 0);
+	t_game.transfer(s2, 4, 7, 0);
 }

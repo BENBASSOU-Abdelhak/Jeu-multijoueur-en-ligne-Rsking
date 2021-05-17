@@ -19,7 +19,7 @@ LobbyPoolDispatcher::LobbyPoolDispatcher(LobbyPool& lbp) : lbp_(lbp)
 }
 
 // pour les tests
-__attribute__((weak)) size_t LobbyPoolDispatcher::dispatch(uint8_t code, Session& session,
+__attribute__((weak)) size_t LobbyPoolDispatcher::dispatch(uint8_t code, std::shared_ptr<Session> session,
 							   boost::asio::const_buffer const& buf,
 							   size_t bytes_transferred)
 {
@@ -41,7 +41,7 @@ __attribute__((weak)) size_t LobbyPoolDispatcher::dispatch(uint8_t code, Session
 	}
 }
 
-size_t LobbyPoolDispatcher::create_lobby(Session& session, boost::asio::const_buffer const& buf,
+size_t LobbyPoolDispatcher::create_lobby(std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
 					 size_t bytes_transferred)
 {
 	if (bytes_transferred < sizeof(GameParameters)) {
@@ -66,7 +66,7 @@ size_t LobbyPoolDispatcher::create_lobby(Session& session, boost::asio::const_bu
 
 	try {
 		Lobby& lobby = lbp_.create_lobby(session, token.name, gp);
-		session.change_dispatcher(std::make_unique<LobbyDispatcher>(lobby));
+		session->change_dispatcher(std::make_unique<LobbyDispatcher>(lobby));
 		send_message(session, static_cast<uint8_t>(0x11), lobby.id());
 	} catch (LogicException const& e) {
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in LobbyPool::create_lobby";
@@ -76,7 +76,7 @@ size_t LobbyPoolDispatcher::create_lobby(Session& session, boost::asio::const_bu
 	return read;
 }
 
-size_t LobbyPoolDispatcher::join_lobby(Session& session, boost::asio::const_buffer const& buf,
+size_t LobbyPoolDispatcher::join_lobby(std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
 					 size_t bytes_transferred)
 {
 	if (bytes_transferred < sizeof(lobby_id_t)) {
@@ -101,7 +101,7 @@ size_t LobbyPoolDispatcher::join_lobby(Session& session, boost::asio::const_buff
 
 	try {
 		Lobby& lobby = lbp_.join_lobby(lid, session, token.name);
-		session.change_dispatcher(std::make_unique<LobbyDispatcher>(lobby));
+		session->change_dispatcher(std::make_unique<LobbyDispatcher>(lobby));
 		GameParameters const& gp = lobby.parameters();
 		send_message(session, static_cast<uint8_t>(0x13), gp);
 
@@ -115,7 +115,7 @@ size_t LobbyPoolDispatcher::join_lobby(Session& session, boost::asio::const_buff
 	return read;
 }
 
-size_t LobbyPoolDispatcher::public_lobby(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
+size_t LobbyPoolDispatcher::public_lobby(std::shared_ptr<Session> session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
 {
 	if (bytes_transferred < 1) {
 		BOOST_LOG_TRIVIAL(warning) << "Message received with code 0x16 is too small";

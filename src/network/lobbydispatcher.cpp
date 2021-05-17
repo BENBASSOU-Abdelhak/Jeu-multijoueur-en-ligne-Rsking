@@ -16,7 +16,7 @@ LobbyDispatcher::LobbyDispatcher(Lobby& lb) : lb_(lb)
 {
 }
 
-size_t LobbyDispatcher::dispatch(uint8_t code, Session& session, boost::asio::const_buffer const& buf,
+size_t LobbyDispatcher::dispatch(uint8_t code, std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
 				 size_t bytes_transferred)
 {
 	switch (code) {
@@ -34,7 +34,8 @@ size_t LobbyDispatcher::dispatch(uint8_t code, Session& session, boost::asio::co
 	}
 }
 
-size_t LobbyDispatcher::kick_player(Session& session, boost::asio::const_buffer const& buf, size_t bytes_transferred)
+size_t LobbyDispatcher::kick_player(std::shared_ptr<Session> session, boost::asio::const_buffer const& buf,
+				    size_t bytes_transferred)
 {
 	if (bytes_transferred <= 1) {
 		BOOST_LOG_TRIVIAL(warning) << "Message received with code 0x15 is too small";
@@ -46,11 +47,11 @@ size_t LobbyDispatcher::kick_player(Session& session, boost::asio::const_buffer 
 	size_t read = unserialize(buf, bytes_transferred, gtag);
 
 	try {
-		Session& kicked = lb_.ban(session, gtag);
+		std::shared_ptr<Session> kicked = lb_.ban(session, gtag);
 		send_message(kicked, static_cast<uint8_t>(0x16), "Vous avez été kick du salon");
 
 		broadcast(lb_, static_cast<uint8_t>(0x14), lb_);
-		kicked.change_dispatcher(std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
+		kicked->change_dispatcher(std::make_unique<LobbyPoolDispatcher>(LobbyPool::get()));
 
 	} catch (LogicException const& e) {
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in Lobby::ban";
@@ -62,7 +63,8 @@ size_t LobbyDispatcher::kick_player(Session& session, boost::asio::const_buffer 
 	return read;
 }
 
-size_t LobbyDispatcher::start_game(Session& session, boost::asio::const_buffer const&, size_t bytes_transferred)
+size_t LobbyDispatcher::start_game(std::shared_ptr<Session> session, boost::asio::const_buffer const&,
+				   size_t bytes_transferred)
 {
 	if (bytes_transferred > 0) {
 		BOOST_LOG_TRIVIAL(warning) << "Message with code 0x20 should be empty";
@@ -76,8 +78,13 @@ size_t LobbyDispatcher::start_game(Session& session, boost::asio::const_buffer c
 		broadcast(lb_, static_cast<uint8_t>(0x30), new_game.current_player(), new_game.troop_gained());
 
 		auto all_sessions = lb_.all_sessions();
-		std::for_each(all_sessions.first, all_sessions.second, [&](Session& session) {
-			session.change_dispatcher(std::make_unique<GameDispatcher>(new_game));
+		std::for_each(all_sessions.first, all_sessions.second, [&](auto const& wsession) {
+			auto sp = wsession.lock();
+			if (sp) {
+				sp->change_dispatcher(std::make_unique<GameDispatcher>(new_game));
+			} else {
+				BOOST_LOG_TRIVIAL(warning) << "Dead session detected";
+			}
 		});
 	} catch (LogicException const& e) {
 		BOOST_LOG_TRIVIAL(warning) << "LogicException in Lobby::start_game";
