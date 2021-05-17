@@ -12,9 +12,9 @@ BOOST_AUTO_TEST_CASE(few_args)
 	BOOST_TEST(result == EXIT_FAILURE);
 }
 
-BOOST_AUTO_TEST_CASE(fail_db)
+/*BOOST_AUTO_TEST_CASE(fail_db)
 {
 	auto result = boost::process::system("./risking 0.0.0.0 42424 1 ./");
 	BOOST_TEST(result == EXIT_FAILURE);
-}
+}*/
 
