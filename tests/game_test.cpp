@@ -602,10 +602,8 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 		BOOST_TEST(true);
 	};
 
-	t_game.skip(*s1);
 	t_game.get_current_player().reset_rem_troops();
 	t_game.skip(*s2);
-
 	// pas son tour de skip
 	try {
 		t_game.skip(*s1);
@@ -654,7 +652,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(5) == 3);
 
 	t_game.get_player_by_tag("p1").set_disconnect();
-	t_game.skip(*s2);
+	//t_game.skip(*s2);
 	t_game.get_current_player().reset_rem_troops();
 	t_game.skip(*s3);
 	t_game.skip(*s3);
