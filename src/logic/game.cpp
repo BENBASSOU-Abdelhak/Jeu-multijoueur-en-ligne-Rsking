@@ -206,6 +206,8 @@ __attribute__((weak)) void Game::transfer(Session const& player_asking, uint16_t
 		get_current_player().set_already_transfered(true);
 		remove_troops_map(src_square, nb_troops);
 		add_troops_map(dst_square, nb_troops);
+
+		skip(player_asking);
 	}
 }
 
