@@ -34,7 +34,7 @@ __attribute__((weak)) Game::Game(GameParameters const& params, Lobby& lobby)
 	}
 }
 
-__attribute__((weak)) void Game::add_troops(Session const& player_asking, uint16_t dst_square, uint16_t nb_troops)
+__attribute__((weak)) void Game::add_troops(std::shared_ptr<Session> player_asking, uint16_t dst_square, uint16_t nb_troops)
 {
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
 		throw LogicException{ 0x70, "Ce n’est pas votre tour" };
@@ -66,7 +66,7 @@ __attribute__((weak)) void Game::add_troops(Session const& player_asking, uint16
 		skip(player_asking);
 }
 
-__attribute__((weak)) atk_result Game::attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
+__attribute__((weak)) atk_result Game::attack(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square,
 					      uint16_t nb_troops)
 {
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
@@ -155,7 +155,7 @@ __attribute__((weak)) atk_result Game::attack(Session const& player_asking, uint
 	return result;
 }
 
-__attribute__((weak)) void Game::transfer(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
+__attribute__((weak)) void Game::transfer(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square,
 					  uint16_t nb_troops)
 {
 	if (m_waiting_transfer)
@@ -211,7 +211,7 @@ __attribute__((weak)) void Game::transfer(Session const& player_asking, uint16_t
 	}
 }
 
-__attribute__((weak)) void Game::skip(Session const& player_asking)
+__attribute__((weak)) void Game::skip(std::shared_ptr<Session> player_asking)
 {
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))
 		throw LogicException{ 0x70, "Ce n’est pas votre tour" };
@@ -231,7 +231,7 @@ __attribute__((weak)) void Game::skip(Session const& player_asking)
 	}
 }
 
-void Game::player_quit(Session const& player_asking, std::string const& gamertag)
+void Game::player_quit(std::shared_ptr<Session> player_asking, std::string const& gamertag)
 {
 	bool find = false;
 	auto ret = lobby().all_players();
@@ -383,7 +383,7 @@ uint8_t Game::player_id(std::string const& player) const
 	assert(false && "joueur non trouvé par player_id()\n");
 }
 
-void Game::transfer_after_attack(Session const& player_asking, uint16_t src_square, uint16_t dst_square,
+void Game::transfer_after_attack(std::shared_ptr<Session> player_asking, uint16_t src_square, uint16_t dst_square,
 				 uint16_t nb_troops)
 {
 	if (get_current_player().get_tag().compare(lobby().get_gamertag(player_asking)))

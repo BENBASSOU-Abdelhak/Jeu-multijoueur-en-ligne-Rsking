@@ -38,7 +38,7 @@ Mocks* cur_mock = nullptr;
 
 /* stubs */
 std::shared_ptr<Lobby> lb = std::make_shared<Lobby>(0, GameParameters{});
-Lobby& LobbyPool::create_lobby(Session& s, const std::string& gamertag, const GameParameters& params)
+Lobby& LobbyPool::create_lobby(std::shared_ptr<Session> s, const std::string& gamertag, const GameParameters& params)
 {
 	cur_mock->gtag = gamertag;
 	cur_mock->gp = params;
@@ -50,7 +50,7 @@ Lobby& LobbyPool::create_lobby(Session& s, const std::string& gamertag, const Ga
 	return *lb;
 }
 constexpr lobby_id_t BAD_LID = 0xffffffff;
-Lobby& LobbyPool::join_lobby(lobby_id_t lid, Session& s, const std::string& gtag)
+Lobby& LobbyPool::join_lobby(lobby_id_t lid, std::shared_ptr<Session> s, const std::string& gtag)
 {
 	if (lid == BAD_LID)
 		throw LogicException{ 0x3, "DUMMY EXCEPTION" };
@@ -70,16 +70,16 @@ GameParameters const& Lobby::parameters() const
 
 	return gp;
 }
-void Lobby::join(Session& session, const std::string& gamertag)
+void Lobby::join(std::shared_ptr<Session> session, const std::string& gamertag)
 {
 	m_list_session.push_back(session);
 	m_gamertag_list.push_back(gamertag);
 }
-Session& Lobby::ban(const Session& se, const std::string& gamertag)
+std::shared_ptr<Session> Lobby::ban(std::shared_ptr<Session> se, const std::string& gamertag)
 {
 	if (gamertag == "FAUX")
 		throw LogicException{ 0x2, "DUMMY ERROR" };
-	return const_cast<Session&>(se);
+	return se;
 }
 std::pair<Lobby::const_player_it, Lobby::const_player_it> Lobby::all_players() const
 {
@@ -92,7 +92,7 @@ std::pair<Lobby::it_session, Lobby::it_session> Lobby::all_sessions()
 	return { m_list_session.begin(), m_list_session.end() };
 }
 
-Game& Lobby::start_game(const Session&)
+Game& Lobby::start_game(const std::shared_ptr<Session>)
 {
 	static auto t = 0;
 	++t;

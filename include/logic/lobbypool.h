@@ -19,14 +19,14 @@ class LobbyPool
 {
     public:
 	static LobbyPool& get();
-	Lobby& create_lobby(Session& session, std::string const& gamertag, GameParameters const& params);
-	Lobby& join_lobby(lobby_id_t lobby_id, Session& session, std::string const& gamertag);
+	Lobby& create_lobby(std::shared_ptr<Session> session, std::string const& gamertag, GameParameters const& params);
+	Lobby& join_lobby(lobby_id_t lobby_id, std::shared_ptr<Session> session, std::string const& gamertag);
 	void destroy_lobby(lobby_id_t lobby_id);
 	Lobby& getLobby(lobby_id_t lobby_id);
 	Lobby const& getLobby(lobby_id_t lobby_id) const;
 	size_t get_nb_lobby() const;
 	size_t get_max_lobby() const;
-	lobby_id_t lobby_dispo(Session& session, std::string const& gamertag);
+	lobby_id_t lobby_dispo(std::shared_ptr<Session> session, std::string const& gamertag);
 
     private:
 	LobbyPool(size_t max_lobbies);

@@ -121,7 +121,7 @@ void Map::set_nb_troops(uint16_t square, uint16_t nb_troops)
 /**
  * @brief test des fonctions :
  *	get_current_player(), current_phase(), is_finished()
- *	apres des appels de skip(*s1), set_player_left()
+ *	apres des appels de skip(s1), set_player_left()
  */
 BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 {
@@ -130,9 +130,9 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -141,78 +141,78 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
 	BOOST_CHECK(t_game.current_phase() == 1);
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s1);
+	t_game.skip(s1);
 	BOOST_CHECK(t_game.current_phase() == 2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
-	t_game.skip(*s1);
+	t_game.skip(s1);
 	BOOST_CHECK(t_game.current_phase() == 3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
-	t_game.skip(*s1);
+	t_game.skip(s1);
 	BOOST_CHECK(t_game.current_phase() == 1);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 	try {
-		t_game.skip(*s2);
+		t_game.skip(s2);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	}
 
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(t_game.current_phase() == 2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
 	BOOST_CHECK(t_game.get_current_player().is_already_transfered() == false);
 	try {
-		t_game.skip(*s3);
+		t_game.skip(s3);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	}
 
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s3);
+	t_game.skip(s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
 
-	t_game.skip(*s3);
+	t_game.skip(s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
 
-	t_game.skip(*s3);
+	t_game.skip(s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
 	BOOST_CHECK(t_game.current_phase() == 1);
 	BOOST_CHECK(t_game.nb_alive() == 3);
 	BOOST_CHECK(t_game.is_finished() == false);
-	t_game.player_quit(*s1, t_game.get_current_player().get_tag());
+	t_game.player_quit(s1, t_game.get_current_player().get_tag());
 	BOOST_CHECK(t_game.current_phase() == 1);
 	BOOST_CHECK(t_game.nb_alive() == 2);
 	BOOST_CHECK(!t_game.get_player_by_tag("p1").is_online());
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(t_game.current_phase() == 2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(t_game.current_phase() == 3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
 
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s3);
+	t_game.skip(s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
 
-	t_game.skip(*s3);
+	t_game.skip(s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p3"));
 
-	t_game.skip(*s3);
+	t_game.skip(s3);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
 	t_game.get_current_player().reset_rem_troops();
@@ -223,13 +223,13 @@ BOOST_FIXTURE_TEST_CASE(current_player_and_phase, CreateMap)
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 	BOOST_CHECK(t_game.current_phase() == 1);
 
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p2"));
 
-	t_game.skip(*s2);
+	t_game.skip(s2);
 	BOOST_CHECK(!t_game.get_current_player().get_tag().compare("p1"));
 	t_game.get_current_player().set_disconnect();
 	BOOST_CHECK(t_game.nb_alive() == 1);
@@ -247,9 +247,9 @@ BOOST_FIXTURE_TEST_CASE(troops_gained, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -323,9 +323,9 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -353,7 +353,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 	// case n'appartient au joueur
 	for (int i = 3; i <= 8; i++) {
 		try {
-			t_game.add_troops(*s1, i, 1);
+			t_game.add_troops(s1, i, 1);
 			BOOST_TEST(false);
 		} catch (LogicException const& e) {
 			BOOST_TEST(true);
@@ -362,19 +362,19 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 
 	// plus de troupe que le joueur en possede
 	try {
-		t_game.add_troops(*s1, 0, 4);
+		t_game.add_troops(s1, 0, 4);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	}
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 2);
-	t_game.add_troops(*s1, 0, 2);
+	t_game.add_troops(s1, 0, 2);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 4);
 
 	// nb troupe nul
 	try {
-		t_game.add_troops(*s1, 0, 0);
+		t_game.add_troops(s1, 0, 0);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -382,7 +382,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 
 	// pas son tour
 	try {
-		t_game.add_troops(*s2, 0, 0);
+		t_game.add_troops(s2, 0, 0);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -390,7 +390,7 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 
 	// le joueur ne possede plus assez de troupe
 	try {
-		t_game.add_troops(*s1, 0, 2);
+		t_game.add_troops(s1, 0, 2);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -398,49 +398,49 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 
 	// le joeur essaie de passer a la phase suivante alors qu'il lui reste 1 troupe a placer
 	try {
-		t_game.skip(*s1);
+		t_game.skip(s1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	}
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 4);
-	t_game.add_troops(*s1, 0, 1);
+	t_game.add_troops(s1, 0, 1);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 5);
-	//t_game.skip(*s1);
+	//t_game.skip(s1);
 
 	// le joeur reessaie de transferer des troupes dans une autre phase
 	try {
-		t_game.add_troops(*s1, 0, 1);
+		t_game.add_troops(s1, 0, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	}
 
-	t_game.skip(*s1);
-	t_game.skip(*s1);
+	t_game.skip(s1);
+	t_game.skip(s1);
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 2);
-	t_game.add_troops(*s2, 3, 1);
+	t_game.add_troops(s2, 3, 1);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 3);
-	//t_game.skip(*s2);
-	t_game.skip(*s2);
-	t_game.skip(*s2);
+	//t_game.skip(s2);
+	t_game.skip(s2);
+	t_game.skip(s2);
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(6) == 2);
-	t_game.add_troops(*s3, 6, 2);
+	t_game.add_troops(s3, 6, 2);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(6) == 4);
-	//t_game.skip(*s3);
-	t_game.skip(*s3);
+	//t_game.skip(s3);
+	t_game.skip(s3);
 	try {
-		t_game.add_troops(*s3, 6, 1);
+		t_game.add_troops(s3, 6, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	}
 
 	try {
-		t_game.add_troops(*s3, 0, 1);
+		t_game.add_troops(s3, 0, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -448,13 +448,13 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 
 	// test que la maj de get_troops_gained() est faite
 	t_game.set_square_owner_map(3, "p1");
-	t_game.skip(*s3);
+	t_game.skip(s3);
 
 	// il ne reste plus que un joueur dans la partie
 	t_game.get_player_by_tag("p2").set_disconnect();
 	t_game.get_player_by_tag("p3").set_disconnect();
 	try {
-		t_game.add_troops(*s1, 1, 5);
+		t_game.add_troops(s1, 1, 5);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -463,9 +463,9 @@ BOOST_FIXTURE_TEST_CASE(add_troops, CreateMap)
 
 	t_game.get_player_by_tag("p2").set_connected();
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(1) == 2);
-	t_game.add_troops(*s1, 1, 5);
+	t_game.add_troops(s1, 1, 5);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(1) == 7);
-	t_game.skip(*s1);
+	t_game.skip(s1);
 }
 
 /**
@@ -478,9 +478,9 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
@@ -503,19 +503,19 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// mauvaise phase pour transferer
 	try {
-		t_game.transfer(*s1, 0, 1, 1);
+		t_game.transfer(s1, 0, 1, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	};
 
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s1);
-	t_game.skip(*s1);
+	t_game.skip(s1);
+	t_game.skip(s1);
 
 	// pas son tour
 	try {
-		t_game.transfer(*s2, 0, 9, 1);
+		t_game.transfer(s2, 0, 9, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -523,7 +523,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// case origine innexistante
 	try {
-		t_game.transfer(*s1, 0, 9, 1);
+		t_game.transfer(s1, 0, 9, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -531,7 +531,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// case dst innexistante
 	try {
-		t_game.transfer(*s1, 11, 1, 1);
+		t_game.transfer(s1, 11, 1, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -539,7 +539,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// mauvaise case de destination de transfert
 	try {
-		t_game.transfer(*s1, 0, 3, 1);
+		t_game.transfer(s1, 0, 3, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -547,7 +547,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// mauvaise case d'origine de transfert
 	try {
-		t_game.transfer(*s1, 4, 2, 1);
+		t_game.transfer(s1, 4, 2, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -555,7 +555,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// mauvaise case d'origine de transfert
 	try {
-		t_game.transfer(*s1, 0, 0, 1);
+		t_game.transfer(s1, 0, 0, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -563,7 +563,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// nb troupe nul
 	try {
-		t_game.transfer(*s1, 0, 1, 0);
+		t_game.transfer(s1, 0, 1, 0);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -571,7 +571,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// nb troupe egale a ceux present sur le territoire
 	try {
-		t_game.transfer(*s1, 0, 1, 4);
+		t_game.transfer(s1, 0, 1, 4);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -579,7 +579,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// nb de troupe trop grand
 	try {
-		t_game.transfer(*s1, 0, 1, 5);
+		t_game.transfer(s1, 0, 1, 5);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -587,7 +587,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 4);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(1) == 2);
-	t_game.transfer(*s1, 0, 1, 1);
+	t_game.transfer(s1, 0, 1, 1);
 	// etat : territoire0 : 3, territoire1 : 3, les autres : 2 troupes
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(0) == 3);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(1) == 3);
@@ -596,34 +596,28 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// transferer deux fois des troupes dans la meme phase
 	try {
-		t_game.transfer(*s1, 0, 1, 1);
+		t_game.transfer(s1, 0, 1, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	};
+
 
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s2);
+	t_game.skip(s2);
+
 	// pas son tour de skip
 	try {
-		t_game.skip(*s1);
+		t_game.skip(s1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
 	};
-	t_game.skip(*s2);
+	t_game.skip(s2);
 
 	// aucun chemin entre case src et dst
 	try {
-		t_game.transfer(*s2, 3, 4, 1);
-		BOOST_TEST(false);
-	} catch (LogicException const& e) {
-		BOOST_TEST(true);
-	};
-
-	// aucun chemin entre case src et dst
-	try {
-		t_game.transfer(*s2, 4, 3, 1);
+		t_game.transfer(s2, 3, 4, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -631,7 +625,7 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// aucun chemin entre case src et dst
 	try {
-		t_game.transfer(*s2, 5, 4, 1);
+		t_game.transfer(s2, 4, 3, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -639,7 +633,15 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	// aucun chemin entre case src et dst
 	try {
-		t_game.transfer(*s2, 4, 5, 1);
+		t_game.transfer(s2, 5, 4, 1);
+		BOOST_TEST(false);
+	} catch (LogicException const& e) {
+		BOOST_TEST(true);
+	};
+
+	// aucun chemin entre case src et dst
+	try {
+		t_game.transfer(s2, 4, 5, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -647,18 +649,20 @@ BOOST_FIXTURE_TEST_CASE(transfer_troops, CreateMap)
 
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 2);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(5) == 2);
-	t_game.transfer(*s2, 3, 5, 1);
+	t_game.transfer(s2, 3, 5, 1);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(3) == 1);
 	BOOST_TEST(t_game.get_map().get_nb_troops_square(5) == 3);
 
 	t_game.get_player_by_tag("p1").set_disconnect();
+
 	//t_game.skip(*s2);
+
 	t_game.get_current_player().reset_rem_troops();
-	t_game.skip(*s3);
-	t_game.skip(*s3);
+	t_game.skip(s3);
+	t_game.skip(s3);
 	t_game.get_player_by_tag("p2").set_disconnect();
 	try {
-		t_game.transfer(*s3, 6, 7, 1);
+		t_game.transfer(s3, 6, 7, 1);
 		BOOST_TEST(false);
 	} catch (LogicException const& e) {
 		BOOST_TEST(true);
@@ -672,16 +676,16 @@ BOOST_FIXTURE_TEST_CASE(test_mark_player_as_eliminated, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 3;
 	Lobby l{ 1, gp };
-	l.join(*s1, "p1");
-	l.join(*s2, "p2");
-	l.join(*s3, "p3");
+	l.join(s1, "p1");
+	l.join(s2, "p2");
+	l.join(s3, "p3");
 	Game t_game(gp, l);
 	/*******************/
 
-	t_game.player_quit(*s1, "p1");
+	t_game.player_quit(s1, "p1");
 	BOOST_TEST(t_game.last_dead() == "p1");
 
-	t_game.player_quit(*s2, "p2");
+	t_game.player_quit(s2, "p2");
 	BOOST_TEST(t_game.last_dead() == "p2");
 	BOOST_TEST(t_game.winner() == "p3");
 }

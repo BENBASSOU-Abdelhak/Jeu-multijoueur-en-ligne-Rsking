@@ -133,13 +133,13 @@ BOOST_FIXTURE_TEST_CASE(create_valid_game, CreateMap)
 	gp.id_map = 1;
 	gp.nb_players = 2;
 	Lobby l{ 1, gp };
-	l.join(*s1, "valid1");
-	l.join(*s2, "valid2");
+	l.join(s1, "valid1");
+	l.join(s2, "valid2");
 	Game t_game(gp, l);
 	/*******************/
 
 	// Elimination de s1
-	t_game.player_quit(*s1, "valid1");
+	t_game.player_quit(s1, "valid1");
 
 	try {
 		BOOST_CHECK(DBMS::get().add_game(t_game));

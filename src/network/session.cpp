@@ -136,7 +136,7 @@ void Session::on_read(beast::error_code ec, std::size_t bytes_transferred)
 
 	if (bytes_transferred == 0) { // no message
 		BOOST_LOG_TRIVIAL(warning) << "Received an empty message";
-		send_error(*this, 0, "message vide");
+		send_error(shared_from_this(), 0, "message vide");
 	} else {
 		BOOST_LOG_TRIVIAL(debug) << "Received: " << bytes_transferred << " bytes";
 		unserialize(bytes_transferred);
@@ -176,7 +176,7 @@ void Session::unserialize(size_t bytes_transferred)
 	buffer_.consume(sizeof(uint8_t));
 	data = buffer_.cdata();
 
-	buffer_.consume(dispatcher_->dispatch(code, *this, data, bytes_transferred - 1));
+	buffer_.consume(dispatcher_->dispatch(code, shared_from_this(), data, bytes_transferred - 1));
 }
 
 // lobby_id_t

@@ -45,7 +45,7 @@ LobbyPool& LobbyPool::get()
 	lpp = new LobbyPool(0);
 	return *lpp;
 }
-Lobby& LobbyPool::create_lobby(Session& s, const std::string& gamertag, const GameParameters& params)
+Lobby& LobbyPool::create_lobby(std::shared_ptr<Session> s, const std::string& gamertag, const GameParameters& params)
 {
 	cur_mock->gtag = gamertag;
 	cur_mock->gp = params;
@@ -57,7 +57,7 @@ Lobby& LobbyPool::create_lobby(Session& s, const std::string& gamertag, const Ga
 	return *lb;
 }
 constexpr lobby_id_t BAD_LID = 0xffffffff;
-Lobby& LobbyPool::join_lobby(lobby_id_t lid, Session& s, const std::string& gtag)
+Lobby& LobbyPool::join_lobby(lobby_id_t lid, std::shared_ptr<Session> s, const std::string& gtag)
 {
 	if (lid == BAD_LID)
 		throw LogicException{ 0x3, "DUMMY EXCEPTION" };
@@ -77,23 +77,23 @@ GameParameters const& Lobby::parameters() const
 
 	return gp;
 }
-void Lobby::join(Session& session, const std::string& gamertag)
+void Lobby::join(std::shared_ptr<Session> session, const std::string& gamertag)
 {
 	m_list_session.push_back(session);
 	m_gamertag_list.push_back(gamertag);
 }
-Session& Lobby::ban(const Session& se, const std::string& gamertag)
+std::shared_ptr<Session> Lobby::ban(std::shared_ptr<Session> se, const std::string& gamertag)
 {
 	if (gamertag == "FAUX")
 		throw LogicException{ 0x2, "DUMMY ERROR" };
-	return const_cast<Session&>(se);
+	return se;
 }
 std::pair<Lobby::const_player_it, Lobby::const_player_it> Lobby::all_players() const
 {
 	//assert(m_gamertag_list.size() > 0);
 	return { m_gamertag_list.cbegin(), m_gamertag_list.cend() };
 }
-Game& Lobby::start_game(const Session&)
+Game& Lobby::start_game(const std::shared_ptr<Session>)
 {
 	static Game g{ GameParameters{}, *this };
 	return g;
@@ -102,19 +102,19 @@ Game& Lobby::start_game(const Session&)
 Game::Game(GameParameters const&, Lobby& l) : m_lobby{ l }
 {
 }
-void Game::add_troops(const Session&, uint16_t dst_square, uint16_t)
+void Game::add_troops(const std::shared_ptr<Session>, uint16_t dst_square, uint16_t)
 {
 	if (dst_square == 0x0)
 		throw LogicException{ 0x40, "DUMMY_ERROR" };
 }
-atk_result Game::attack(const Session&, uint16_t src_square, uint16_t, uint16_t)
+atk_result Game::attack(const std::shared_ptr<Session>, uint16_t src_square, uint16_t, uint16_t)
 {
 	static atk_result atr{};
 	if (src_square == 0x0)
 		throw LogicException{ 0x50, "DUMMY_ERROR" };
 	return atr;
 }
-void Game::transfer(const Session&, uint16_t, uint16_t, uint16_t nb_troops)
+void Game::transfer(const std::shared_ptr<Session>, uint16_t, uint16_t, uint16_t nb_troops)
 {
 	if (nb_troops == 0x0)
 		throw LogicException{ 0x62, "DUMMY_ERROR" };
@@ -151,7 +151,7 @@ std::string const& Game::last_dead() const
 	static std::string str{ "LAST_DEAD" };
 	return str;
 }
-void Game::skip(const Session&)
+void Game::skip(const std::shared_ptr<Session>)
 {
 	static int i = 0;
 	++i;
@@ -546,7 +546,7 @@ BOOST_AUTO_TEST_CASE(next_0x70_new_turn, *boost::unit_test::timeout(1))
 	size_t read = wss_s->read(buf);
 
 	unserialize(static_cast<raw_type>(buf.cdata().data()), read, code);
-	BOOST_TEST(code == 0x30);
+	BOOST_TEST(code == 0x71);
 }
 
 BOOST_AUTO_TEST_CASE(next_0x70_same_turn, *boost::unit_test::timeout(1))
