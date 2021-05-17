@@ -136,6 +136,9 @@ bool Lobby::verification_join(std::string const& gamertag) const
 		if (m_gamertag_ban_list[i] == gamertag)
 			return true;
 	}
+	auto itr = std::find(std::begin(m_gamertag_list), std::end(m_gamertag_list), gamertag);
+	if (itr != m_gamertag_list.end())
+		return true;
 
 	return false;
 }

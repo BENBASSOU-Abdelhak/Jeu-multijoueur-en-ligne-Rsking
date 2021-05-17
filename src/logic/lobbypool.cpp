@@ -54,7 +54,7 @@ __attribute__((weak)) Lobby& LobbyPool::join_lobby(lobby_id_t lobby_id, Session&
 
 	bool his_ban = m_lobby_list.at(lobby_id).verification_join(gamertag);
 	if (his_ban == true)
-		throw LogicException(0x14, "Joueur exclu du salon!");
+		throw LogicException(0x14, "Joueur exclu du salon ou déjà présent!");
 
 	m_lobby_list.at(lobby_id).join(session, gamertag);
 
